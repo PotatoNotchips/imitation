@@ -161,6 +161,7 @@ class DemonstrationAlgorithm(BaseImitationAlgorithm, Generic[TransitionKind]):
         )
 
         if demonstrations is not None:
+            print("This is the expert demons beofre processing: ", demonstrations)
             self.set_demonstrations(demonstrations)
 
     @abc.abstractmethod
@@ -209,7 +210,11 @@ class _WrappedDataLoader:
             ValueError: `self.data_loader` returns a batch of size not equal to
                 `self.expected_batch_size`.
         """
+        print("The following is the data_loader type: ", type(self.data_loader))
+        print("The following is the data_loader: ", self.data_loader)
         for batch in self.data_loader:
+            print("This is the batch data type: ", batch)
+            print("This is the batch data: ", batch)
             if len(batch["obs"]) != self.expected_batch_size:
                 raise ValueError(
                     f"Expected batch size {self.expected_batch_size} "

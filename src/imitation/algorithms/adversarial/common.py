@@ -304,10 +304,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         """Reward used to train policy at "test" time after adversarial training."""
 
     def set_demonstrations(self, demonstrations: base.AnyTransitions) -> None:
+        print("This is the demonstrations passed to the set_demon function: ", demonstrations)
         self._demo_data_loader = base.make_data_loader(
             demonstrations,
             self.demo_batch_size,
         )
+        print("This is the demon passed to the data loader function: ", self._demo_data_loader)
         self._endless_expert_iterator = util.endless_iter(self._demo_data_loader)
 
     def _next_expert_batch(self) -> Mapping:

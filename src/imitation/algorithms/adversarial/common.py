@@ -309,8 +309,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             print(f"Key: {key}")
             # Print a subset of elements inside each key
             count = 0
-            for element in large_dict[key]:
-                print(f"   {element}: {large_dict[key][element]}")
+            for element in demonstrations[key]:
+                print(f"   {element}: {demonstrations[key][element]}")
                 count += 1
                 if count == 3:  # Adjust the number of elements to display as needed
                     break

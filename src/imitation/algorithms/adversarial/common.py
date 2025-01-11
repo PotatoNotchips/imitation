@@ -309,11 +309,18 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             
             if isinstance(value, dict):
                 for subkey, subvalue in value.items():
-                    print(f"   {subkey}: {subvalue}")
+                    if isinstance(subvalue, (str, np.ndarray)):
+                        sliced_value = str(subvalue)[:50] + '...' if len(str(subvalue)) > 50 else str(subvalue)
+                        print(f"   {subkey}: {sliced_value}")
+                    else:
+                        print(f"   {subkey}: {subvalue}")
             elif isinstance(value, np.ndarray):
-                print(f"   NumPy Array: {value}")
+                sliced_value = np.array_str(value[:3]) + '...' if len(value) > 3 else np.array_str(value)
+                print(f"   NumPy Array: {sliced_value}")
             else:
-                print(f"   Value: {value}")
+                sliced_value = str(value)[:50] + '...' if len(str(value)) > 50 else str(value)
+                print(f"   Value: {sliced_value}")
+            
             print()  # Add a newline for better readability
 
         self._demo_data_loader = base.make_data_loader(

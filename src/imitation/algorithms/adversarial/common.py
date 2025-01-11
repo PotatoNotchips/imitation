@@ -318,7 +318,10 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 sliced_value = np.array_str(value[:3]) + '...' if len(value) > 3 else np.array_str(value)
                 print(f"   NumPy Array: {sliced_value}")
             else:
-                sliced_value = str(value)[:50] + '...' if len(str(value)) > 50 else str(value)
+                if len(str(value)) > 50:
+                    sliced_value = str(value)[:50] + '...'
+                else:
+                    sliced_value = str(value)
                 print(f"   Value: {sliced_value}")
             
             print()  # Add a newline for better readability

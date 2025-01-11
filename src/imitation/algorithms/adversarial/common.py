@@ -304,17 +304,16 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         """Reward used to train policy at "test" time after adversarial training."""
 
     def set_demonstrations(self, demonstrations: base.AnyTransitions) -> None:
-        print("This is the demonstrations passed to the set_demon function: ")
-        for key in demonstrations:
+        for key, value in demonstrations.items():
             print(f"Key: {key}")
-            # Print a subset of elements inside each key
-            count = 0
-            for element in demonstrations[key]:
-                print(f"   {element}: {demonstrations[key][element]}")
-                count += 1
-                if count == 3:  # Adjust the number of elements to display as needed
-                    break
             
+            if isinstance(value, dict):
+                for subkey, subvalue in value.items():
+                    print(f"   {subkey}: {subvalue}")
+            elif isinstance(value, np.ndarray):
+                print(f"   NumPy Array: {value}")
+            else:
+                print(f"   Value: {value}")
             print()  # Add a newline for better readability
 
         self._demo_data_loader = base.make_data_loader(

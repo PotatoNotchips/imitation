@@ -307,7 +307,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         for key, value in demonstrations.items():
             print(f"Key: {key}")
             
-            if isinstance(value, dict):
+            '''if isinstance(value, dict):
                 for subkey, subvalue in value.items():
                     if isinstance(subvalue, (str, np.ndarray)):
                         sliced_value = str(subvalue)[:50] + '...' if len(str(subvalue)) > 50 else str(subvalue)
@@ -322,7 +322,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     sliced_value = str(value)[:50] + '...'
                 else:
                     sliced_value = str(value)
-                print(f"   Value: {sliced_value}")
+                print(f"   Value: {sliced_value}")'''
             
             print()  # Add a newline for better readability
 

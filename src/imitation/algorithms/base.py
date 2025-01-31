@@ -211,10 +211,8 @@ class _WrappedDataLoader:
                 `self.expected_batch_size`.
         """
         print("The following is the data_loader type: ", type(self.data_loader))
-        print("The following is the data_loader: ", self.data_loader)
         for batch in self.data_loader:
-            print("This is the batch data type: ", batch)
-            print("This is the batch data: ", batch)
+            print("This is the batch data type: ", type(batch))
             if len(batch["obs"]) != self.expected_batch_size:
                 raise ValueError(
                     f"Expected batch size {self.expected_batch_size} "

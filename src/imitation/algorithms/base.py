@@ -213,6 +213,7 @@ class _WrappedDataLoader:
         print("The following is the data_loader type: ", type(self.data_loader))
         if isinstance(self.data_loader, dict):
             batch = self.data_loader
+            self.expected_batch_size = len(batch["obs"])
     
             if len(batch["obs"]) != self.expected_batch_size:
                 raise ValueError(

@@ -67,7 +67,8 @@ class RewardVecEnvWrapper(vec_env.VecEnvWrapper):
         assert not isinstance(venv, RewardVecEnvWrapper)
         super().__init__(venv)
         self.episode_rewards: Deque = collections.deque(maxlen=ep_history)
-        self._cumulative_rew = np.zeros((venv.num_envs,))
+        # self._cumulative_rew = np.zeros((venv.num_envs,))
+        self._cumulative_rew = np.zeros((1,))
         self.reward_fn = reward_fn
         self._old_obs = None
         self._actions = None

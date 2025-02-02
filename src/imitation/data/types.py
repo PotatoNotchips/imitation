@@ -77,10 +77,8 @@ class DictObs:
         Returns:
             The length (first dimension) of the constituent arrays
         """
-        for key, value in self._d.items():
-            print(f"Key: {key}, Length: {len(value)}")
         lens = set(len(v) for v in self._d.values())
-        if len(lens) == 1:
+        if len(lens) >= 1:
             return lens.pop()
         elif len(lens) == 0:
             raise RuntimeError("Length not defined as DictObs is empty")

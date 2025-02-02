@@ -211,19 +211,35 @@ class _WrappedDataLoader:
                 `self.expected_batch_size`.
         """
         print("The following is the data_loader type: ", type(self.data_loader))
-        for batch in self.data_loader:
-            print("This is the batch data type: ", type(batch))
+        if isinstance(self.data_loader, dict):
+            batch = self.data_loader
+    
             if len(batch["obs"]) != self.expected_batch_size:
                 raise ValueError(
-                    f"Expected batch size {self.expected_batch_size} "
-                    f"!= {len(batch['obs'])} = len(batch['obs'])",
+                    f"Expected batch size {self.expected_batch_size} != {len(batch['obs'])}"
                 )
+    
             if len(batch["acts"]) != self.expected_batch_size:
                 raise ValueError(
-                    f"Expected batch size {self.expected_batch_size} "
-                    f"!= {len(batch['acts'])} = len(batch['acts'])",
+                    f"Expected batch size {self.expected_batch_size} != {len(batch['acts'])}"
                 )
+    
             yield batch
+        else:
+            for batch in self.data_loader:
+                print("This is the batch data type: ", type(batch))
+    
+                if len(batch["obs"]) != self.expected_batch_size:
+                    raise ValueError(
+                        f"Expected batch size {self.expected_batch_size} != {len(batch['obs'])}"
+                    )
+    
+                if len(batch["acts"]) != self.expected_batch_size:
+                    raise ValueError(
+                        f"Expected batch size {self.expected_batch_size} != {len(batch['acts'])}"
+                    )
+    
+                yield batch
 
 
 def make_data_loader(

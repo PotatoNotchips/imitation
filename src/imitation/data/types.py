@@ -79,7 +79,6 @@ class DictObs:
         """
         lens = set(len(v) for v in self._d.values())
         if len(lens) >= 1:
-            print("This is the length of DictObs by the lib:", lens.pop())
             return lens.pop()
         elif len(lens) == 0:
             raise RuntimeError("Length not defined as DictObs is empty")

@@ -307,6 +307,16 @@ class ReplayBuffer:
             if any(x is None for x in params):
                 raise ValueError("Shape or dtype missing and no environment specified.")
 
+        if obs_shape is None:
+            obs_shape = Dict("stock_obs": (390, 33),
+                             "additional_info": (4,))
+        if act_shape is None:
+            act_shape = (3,)
+        if obs_dtype is None:
+            obs_dtype = np.float32
+        if act_dtype is None:
+            act_dtype = np.float32
+        
         assert obs_shape is not None
         assert act_shape is not None
         assert obs_dtype is not None

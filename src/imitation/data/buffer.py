@@ -308,8 +308,8 @@ class ReplayBuffer:
                 raise ValueError("Shape or dtype missing and no environment specified.")
 
         if obs_shape is None:
-            obs_shape = Dict({"stock_obs": (390, 33),
-                             "additional_info": (4,)})
+            obs_shape = {"stock_obs": (390, 33),
+                         "additional_info": (4,)}
         if act_shape is None:
             act_shape = (3,)
         if obs_dtype is None:

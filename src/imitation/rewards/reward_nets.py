@@ -76,13 +76,21 @@ class RewardNet(nn.Module, abc.ABC):
             observations, actions, next observations and dones.
         """
         state_values = []
+        next_state_values = []
         for key, value in state.items():
             value_array = np.array(value)
             flat_value = value_array.flatten()
             state_values.extend(flat_value)
 
+        for key, value in next_state.items():
+            value_array = np.array(value)
+            flat_value = value_array.flatten()
+            next_state_values.extend(flat_value)
+
         state_values = np.array(state_values)
+        next_state_values = np.array(state_values)
         state = state_values.flatten()
+        next_state = next_state_values.flatten()
         
         state_th = util.safe_to_tensor(state).to(self.device)
         action_th = util.safe_to_tensor(action).to(self.device)

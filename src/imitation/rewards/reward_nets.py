@@ -77,7 +77,7 @@ class RewardNet(nn.Module, abc.ABC):
         """
         state_values = []
         for key, value in state.items():
-            flat_value = np.ravel(value)
+            flat_value = np.array(value).flatten()
             state_values.append(flat_value)
 
         state_values = np.array(state_values)

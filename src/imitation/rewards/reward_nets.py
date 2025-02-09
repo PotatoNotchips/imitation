@@ -119,7 +119,15 @@ class RewardNet(nn.Module, abc.ABC):
         done_th = done_th.to(th.float32)
 
         n_gen = len(state_th)
-        assert state_th.shape == next_state_th.shape
+        # Check if state_th and next_state_th are dictionaries
+        if isinstance(state_th, dict) and isinstance(next_state_th, dict):
+            # Check shapes for each key in the dictionaries
+            for key in state_th.keys():
+                assert key in next_state_th, f"Key {key} not found in next_state_th."
+                assert state_th[key].shape == next_state_th[key].shape, f"Shapes do not match for key {key}: {state_th[key].shape} vs {next_state_th[key].shape}"
+        else:
+            # If not dictionaries, use original shape comparison
+            assert state_th.shape == next_state_th.shape, "Shapes do not match."
         assert len(action_th) == n_gen
 
         return state_th, action_th, next_state_th, done_th

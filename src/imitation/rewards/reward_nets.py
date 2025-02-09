@@ -119,6 +119,8 @@ class RewardNet(nn.Module, abc.ABC):
         done_th = done_th.to(th.float32)
 
         n_gen = len(state_th)
+        print("This is n_gen: ", n_gen)
+        print("This is the len of action_th: ", len(action_th))
         # Check if state_th and next_state_th are dictionaries
         if isinstance(state_th, dict) and isinstance(next_state_th, dict):
             # Check shapes for each key in the dictionaries

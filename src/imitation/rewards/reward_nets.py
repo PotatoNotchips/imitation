@@ -118,9 +118,19 @@ class RewardNet(nn.Module, abc.ABC):
         )
         done_th = done_th.to(th.float32)
 
-        n_gen = len(state_th)
+        # Determine n_gen based on state_th
+        if isinstance(state_th, dict):
+            # Concatenate the tensors in the state dictionary to find the number of generated states
+            state_values = [state_th[key] for key in state_th]
+            n_gen = state_values[0].shape[0]  # Assuming all keys have the same first dimension
+        else:
+            n_gen = state_th.shape[0]
+    
         print("This is n_gen: ", n_gen)
         print("This is the len of action_th: ", len(action_th))
+        
+        # n_gen = len(state_th)
+        
         # Check if state_th and next_state_th are dictionaries
         if isinstance(state_th, dict) and isinstance(next_state_th, dict):
             # Check shapes for each key in the dictionaries

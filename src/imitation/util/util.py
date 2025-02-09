@@ -258,7 +258,7 @@ def safe_to_tensor(array: Union[np.ndarray, th.Tensor], **kwargs) -> th.Tensor:
     if isinstance(array, th.Tensor):
         return array
 
-  if isinstance(array, dict):
+    if isinstance(array, dict):
         return {key: safe_to_tensor(value, **kwargs) for key, value in array.items()}
     
     if not array.flags.writeable:

@@ -468,11 +468,21 @@ class BasicRewardNet(RewardNet):
     def forward(self, state, action, next_state, done):
         inputs = []
         if self.use_state:
-            inputs.append(th.flatten(state, 1))
+            if isinstance(state, dict):
+                # Flatten and concatenate all tensors in the state dictionary
+                flattened_state = [th.flatten(value, 1) for value in state.values()]
+                inputs.append(th.cat(flattened_state, dim=1))
+            else:
+                inputs.append(th.flatten(state, 1))
         if self.use_action:
             inputs.append(th.flatten(action, 1))
         if self.use_next_state:
-            inputs.append(th.flatten(next_state, 1))
+            if isinstance(next_state, dict):
+                # Flatten and concatenate all tensors in the next_state dictionary
+                flattened_next_state = [th.flatten(value, 1) for value in next_state.values()]
+                inputs.append(th.cat(flattened_next_state, dim=1))
+            else:
+                inputs.append(th.flatten(next_state, 1))
         if self.use_done:
             inputs.append(th.reshape(done, [-1, 1]))
 

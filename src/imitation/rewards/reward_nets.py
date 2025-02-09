@@ -75,10 +75,17 @@ class RewardNet(nn.Module, abc.ABC):
             Preprocessed transitions: a Tuple of tensors containing
             observations, actions, next observations and dones.
         """
+        state_th = util.safe_to_tensor(state)
+        action_th = util.safe_to_tensor(action)
+        next_state_th = util.safe_to_tensor(next_state)
+        done_th = util.safe_to_tensor(done)
+
+        '''
         state_th = util.safe_to_tensor(state).to(self.device)
         action_th = util.safe_to_tensor(action).to(self.device)
         next_state_th = util.safe_to_tensor(next_state).to(self.device)
         done_th = util.safe_to_tensor(done).to(self.device)
+        '''
 
         del state, action, next_state, done  # unused
 

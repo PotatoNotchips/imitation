@@ -173,8 +173,15 @@ class RewardNet(nn.Module, abc.ABC):
             with th.no_grad():
                 rew_th = self(state_th, action_th, next_state_th, done_th)
 
-            assert rew_th.shape == state.shape[:1]
-            return rew_th
+        if isinstance(state, dict):
+            # Use the shape of the first tensor in the state dictionary
+            expected_shape = list(state.values())[0].shape[:1]
+        else:
+            # Use the shape of the state tensor directly
+            expected_shape = state.shape[:1]
+        
+        assert rew_th.shape == expected_shape
+        return rew_th
 
     def predict(
         self,

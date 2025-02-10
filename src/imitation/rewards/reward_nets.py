@@ -881,6 +881,10 @@ class BasicPotentialMLP(nn.Module):
         )
 
     def forward(self, state: th.Tensor) -> th.Tensor:
+        if isinstance(state, dict):
+            # Flatten and concatenate all tensors in the state dictionary
+            flattened_state = [th.flatten(value, 1) for value in state.values()]
+            state = th.cat(flattened_state, dim=1)
         return self._potential_net(state)
 
 

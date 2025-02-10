@@ -496,10 +496,6 @@ class BasicRewardNet(RewardNet):
         inputs_concat = th.cat(inputs, dim=1)
 
         outputs = self.mlp(inputs_concat)
-
-        # Print statements to confirm shapes
-        print("Output shape: ", outputs.shape)
-        print("Expected shape: ", expected_shape)
         
         assert outputs.shape == expected_shape
 
@@ -787,8 +783,7 @@ class ShapedRewardNet(ForwardWrapper):
         else:
             # Use the state tensor shape directly
             expected_shape = state.shape[:1]
-        print("Final_rew shape:", final_rew.shape)
-        print("expected shape:", expected_shape)
+
         assert final_rew.shape == expected_shape
         return final_rew
 

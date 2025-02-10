@@ -125,9 +125,6 @@ class RewardNet(nn.Module, abc.ABC):
             n_gen = state_values[0].shape[0]  # Assuming all keys have the same first dimension
         else:
             n_gen = state_th.shape[0]
-    
-        print("This is n_gen: ", n_gen)
-        print("This is the len of action_th: ", len(action_th))
         
         # n_gen = len(state_th)
         
@@ -777,7 +774,15 @@ class ShapedRewardNet(ForwardWrapper):
             + self.discount_factor * new_shaping
             - old_shaping_output
         )
-        assert final_rew.shape == state.shape[:1]
+        if isinstance(state, dict):
+            # Use the shape of the first tensor in the state dictionary
+            expected_shape = list(state.values())[0].shape[:1]
+        else:
+            # Use the state tensor shape directly
+            expected_shape = state.shape[:1]
+        print("Final_rew shape:", final_rew.shape)
+        print("expected shape:", expected_shape)
+        assert final_rew.shape == expected_shape
         return final_rew
 
 

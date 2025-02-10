@@ -472,8 +472,11 @@ class BasicRewardNet(RewardNet):
                 # Flatten and concatenate all tensors in the state dictionary
                 flattened_state = [th.flatten(value, 1) for value in state.values()]
                 inputs.append(th.cat(flattened_state, dim=1))
+                # Get the shape from the first tensor in the state
+                expected_shape = list(state.values())[0].shape[:1]
             else:
                 inputs.append(th.flatten(state, 1))
+                expected_shape = state.shape[:1]
         if self.use_action:
             inputs.append(th.flatten(action, 1))
         if self.use_next_state:
@@ -489,7 +492,12 @@ class BasicRewardNet(RewardNet):
         inputs_concat = th.cat(inputs, dim=1)
 
         outputs = self.mlp(inputs_concat)
-        assert outputs.shape == state.shape[:1]
+
+        # Print statements to confirm shapes
+        print("Output shape: ", outputs.shape)
+        print("Expected shape: ", expected_shape)
+        
+        assert outputs.shape == expected_shape
 
         return outputs
 

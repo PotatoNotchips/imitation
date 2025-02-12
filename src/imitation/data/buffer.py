@@ -20,7 +20,21 @@ def num_samples(data: Mapping[Any, np.ndarray]) -> int:
     Raises:
         ValueError: The length is not unique.
     """
-    n_samples_list = [arr.shape[0] for arr in data.values()]
+    # Check if data is a dictionary
+    if not isinstance(data, dict):
+        raise ValueError("Expected data to be a dictionary.")
+
+    # Check for empty data
+    if not data:
+        raise ValueError("Data is empty.")
+
+    # Validate that each key in data corresponds to a valid array-like structure
+    n_samples_list = []
+    for key, arr in data.items():
+        if not isinstance(arr, (np.ndarray, th.Tensor)):
+            raise ValueError(f"Unexpected type for key {key}: {type(arr)}. Expected numpy array or tensor.")
+    
+    # n_samples_list = [arr.shape[0] for arr in data.values()]
     n_samples_np = np.unique(n_samples_list)
     if len(n_samples_np) > 1:
         raise ValueError("Keys map to different length values.")

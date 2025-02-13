@@ -2,6 +2,7 @@
 
 from typing import Any, Mapping, Optional, Tuple
 
+import torch as th
 import numpy as np
 from stable_baselines3.common import vec_env
 

@@ -7,7 +7,7 @@ import numpy as np
 from stable_baselines3.common import vec_env
 
 from imitation.data import types
-
+from imitation.data.types import DictObs
 
 def num_samples(data: Mapping[Any, np.ndarray]) -> int:
     """Computes the number of samples contained in `data`.

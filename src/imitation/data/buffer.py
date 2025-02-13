@@ -32,8 +32,14 @@ def num_samples(data: Mapping[Any, np.ndarray]) -> int:
     # Validate that each key in data corresponds to a valid array-like structure
     n_samples_list = []
     for key, arr in data.items():
-        if not isinstance(arr, (np.ndarray, th.Tensor)):
-            raise ValueError(f"Unexpected type for key {key}: {type(arr)}. Expected numpy array or tensor.")
+        if isinstance(arr, DictObs):
+            # Handle DictObs type specifically
+            n_samples = len(arr)  # Assuming DictObs can be measured this way
+            n_samples_list.append(n_samples)
+        elif isinstance(arr, (np.ndarray, th.Tensor)):
+            n_samples_list.append(arr.shape[0])
+        else:
+            raise ValueError(f"Unexpected type for key {key}: {type(arr)}. Expected numpy array, tensor, or DictObs.")
     
     # n_samples_list = [arr.shape[0] for arr in data.values()]
     n_samples_np = np.unique(n_samples_list)

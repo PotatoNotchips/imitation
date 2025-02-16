@@ -200,6 +200,8 @@ class Buffer:
 
         for k, arr in data.items():
             # Check if arr is a dictionary itself
+            print("K: ", k)
+            print("arr: ", arr)
             if isinstance(arr, dict):
                 for sub_k, sub_arr in arr.items():
                     if sub_arr.shape[1:] != self.sample_shapes[k][sub_k]:
@@ -212,9 +214,29 @@ class Buffer:
         if new_idx > self.capacity:
             n_remain = self.capacity - self._idx
             # Need to loop around the buffer. Break into two "easy" calls.
-            self._store_easy({k: arr[:n_remain] for k, arr in data.items()})
-            assert self._idx == 0
-            self._store_easy({k: arr[n_remain:] for k, arr in data.items()})
+            # Handle storage for both dict and non-dict formats
+            if any(isinstance(arr, dict) for arr in data.values()):
+                # Flatten and store for dictionary entries
+                for k, arr in list(data.items()):
+                    if isinstance(arr, dict):
+                        for sub_k, sub_arr in arr.items():
+                            self._store_easy({f"{k}.{sub_k}": sub_arr[:n_rem]})
+                    else:
+                        self._store_easy({k: arr[:n_rem]})
+    
+                assert self._idx == 0
+    
+                for k, arr in list(data.items()):
+                    if isinstance(arr, dict):
+                        for sub_k, sub_arr in arr.items():
+                            self._store_easy({f"{k}.{sub_k}": sub_arr[n_rem:]})
+                    else:
+                        self._store_easy({k: arr[n_rem:]})
+            else:
+                # Loop around the buffer and call store_easy for non-dict entries
+                self._store_easy({k: arr[:n_rem] for k, arr in data.items()})
+                assert self._idx == 0
+                self._store_easy({k: arr[n_rem:] for k, arr in data.items()})
         else:
             self._store_easy(data)
 

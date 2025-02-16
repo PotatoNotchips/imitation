@@ -199,8 +199,14 @@ class Buffer:
                 data = {k: arr[-self.capacity :] for k, arr in data.items()}
 
         for k, arr in data.items():
-            if arr.shape[1:] != self.sample_shapes[k]:
-                raise ValueError(f"Wrong data shape for {k}")
+            # Check if arr is a dictionary itself
+            if isinstance(arr, dict):
+                for sub_k, sub_arr in arr.items():
+                    if sub_arr.shape[1:] != self.sample_shapes[k][sub_k]:
+                        raise ValueError(f"Wrong data shape for {k}.{sub_k}")
+            else:
+                if arr.shape[1:] != self.sample_shapes[k]:
+                    raise ValueError(f"Wrong data shape for {k}")
 
         new_idx = self._idx + n_samples
         if new_idx > self.capacity:

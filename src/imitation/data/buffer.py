@@ -219,6 +219,8 @@ class Buffer:
             if any(isinstance(arr, (dict, DictObs)) for arr in data.values()):
                 # Flatten and store for dictionary entries
                 for k, arr in list(data.items()):
+                    print("k after the first round stored samples: ", k)
+                    print("arr after the first round stored samples: ", arr)
                     if isinstance(arr, dict):
                         for sub_k, sub_arr in arr.items():
                             self._store_easy({f"{k}.{sub_k}": sub_arr[:n_remain]})
@@ -228,6 +230,8 @@ class Buffer:
                 assert self._idx == 0
     
                 for k, arr in list(data.items()):
+                    print("k after the first round stored samples and assert: ", k)
+                    print("arr after the first round stored samples and assert: ", arr)
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
                             self._store_easy({f"{k}.{sub_k}": sub_arr[n_remain:]})
@@ -236,9 +240,14 @@ class Buffer:
             else:
                 # Loop around the buffer and call store_easy for non-dict entries
                 self._store_easy({k: arr[:n_rem] for k, arr in data.items()})
+                print("k after the first round stored samples: ", k)
+                print("arr after the first round stored samples: ", arr)
                 assert self._idx == 0
+                print("k after the first round stored samples and assert: ", k)
+                print("arr after the first round stored samples and assert: ", arr)
                 self._store_easy({k: arr[n_rem:] for k, arr in data.items()})
         else:
+            print("The Data Sample stored in first round: ", data)
             self._store_easy(data)
 
     def _store_easy(self, data: Mapping[str, np.ndarray]) -> None:

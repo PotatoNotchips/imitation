@@ -221,18 +221,18 @@ class Buffer:
                 for k, arr in list(data.items()):
                     if isinstance(arr, dict):
                         for sub_k, sub_arr in arr.items():
-                            self._store_easy({f"{k}.{sub_k}": sub_arr[:n_rem]})
+                            self._store_easy({f"{k}.{sub_k}": sub_arr[:n_remain]})
                     else:
-                        self._store_easy({k: arr[:n_rem]})
+                        self._store_easy({k: arr[:n_remain]})
     
                 assert self._idx == 0
     
                 for k, arr in list(data.items()):
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
-                            self._store_easy({f"{k}.{sub_k}": sub_arr[n_rem:]})
+                            self._store_easy({f"{k}.{sub_k}": sub_arr[n_remain:]})
                     else:
-                        self._store_easy({k: arr[n_rem:]})
+                        self._store_easy({k: arr[n_remain:]})
             else:
                 # Loop around the buffer and call store_easy for non-dict entries
                 self._store_easy({k: arr[:n_rem] for k, arr in data.items()})

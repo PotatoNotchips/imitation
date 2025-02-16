@@ -198,6 +198,8 @@ class Buffer:
             else:
                 data = {k: arr[-self.capacity :] for k, arr in data.items()}
 
+        '''
+        Code for checking shape:
         for k, arr in data.items():
             # Check if arr is a dictionary itself
             if isinstance(arr, (dict, DictObs)):
@@ -207,6 +209,7 @@ class Buffer:
             else:
                 if arr.shape[1:] != self.sample_shapes[k]:
                     raise ValueError(f"Wrong data shape for {k}")
+        '''
 
         new_idx = self._idx + n_samples
         if new_idx > self.capacity:

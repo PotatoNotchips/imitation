@@ -200,8 +200,6 @@ class Buffer:
 
         for k, arr in data.items():
             # Check if arr is a dictionary itself
-            print("K: ", k)
-            print("arr: ", arr)
             if isinstance(arr, (dict, DictObs)):
                 for sub_k, sub_arr in arr.items():
                     if sub_arr.shape[1:] != self.sample_shapes[k][sub_k]:

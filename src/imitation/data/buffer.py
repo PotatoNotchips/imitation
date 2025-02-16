@@ -202,7 +202,7 @@ class Buffer:
             # Check if arr is a dictionary itself
             print("K: ", k)
             print("arr: ", arr)
-            if isinstance(arr, dict):
+            if isinstance(arr, (dict, DictObs)):
                 for sub_k, sub_arr in arr.items():
                     if sub_arr.shape[1:] != self.sample_shapes[k][sub_k]:
                         raise ValueError(f"Wrong data shape for {k}.{sub_k}")
@@ -215,7 +215,7 @@ class Buffer:
             n_remain = self.capacity - self._idx
             # Need to loop around the buffer. Break into two "easy" calls.
             # Handle storage for both dict and non-dict formats
-            if any(isinstance(arr, dict) for arr in data.values()):
+            if any(isinstance(arr, (dict, DictObs)) for arr in data.values()):
                 # Flatten and store for dictionary entries
                 for k, arr in list(data.items()):
                     if isinstance(arr, dict):
@@ -227,7 +227,7 @@ class Buffer:
                 assert self._idx == 0
     
                 for k, arr in list(data.items()):
-                    if isinstance(arr, dict):
+                    if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
                             self._store_easy({f"{k}.{sub_k}": sub_arr[n_rem:]})
                     else:

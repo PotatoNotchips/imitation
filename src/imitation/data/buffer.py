@@ -221,7 +221,7 @@ class Buffer:
                 for k, arr in list(data.items()):
                     print("k after the first round stored samples: ", k)
                     print("arr after the first round stored samples: ", arr)
-                    if isinstance(arr, dict):
+                    if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
                             self._store_easy({f"{k}.{sub_k}": sub_arr[:n_remain]})
                     else:

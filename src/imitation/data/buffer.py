@@ -223,7 +223,9 @@ class Buffer:
                     print("arr after the first round stored samples: ", arr)
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
-                            self._store_easy({[k][sub_k]: sub_arr[:n_remain]})
+                            # Store the sub-arrays directly under their nested keys
+                            nested_key = (k, sub_k)  # Use a tuple for nested keys
+                            self._store_easy({nested_key: sub_arr[:n_remain]})
                     else:
                         self._store_easy({k: arr[:n_remain]})
     
@@ -234,7 +236,8 @@ class Buffer:
                     print("arr after the first round stored samples and assert: ", arr)
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
-                            self._store_easy({[k][sub_k]: sub_arr[n_remain:]})
+                            nested_key = (k, sub_k)
+                            self._store_easy({nested_key: sub_arr[n_remain:]})
                     else:
                         self._store_easy({k: arr[n_remain:]})
             else:
@@ -268,13 +271,21 @@ class Buffer:
         assert n_samples <= self.capacity - self._idx
         idx_hi = self._idx + n_samples
         for k, arr in data.items():
-            if k not in self._arrays:
-                self._arrays[k] = {}
+            # Ensure k is a tuple for nested keys
+            if isinstance(k, tuple):
+                nested_key = k
+                # Initialize nested dictionary if it does not exist
+                if nested_key[0] not in self._arrays:
+                    self._arrays[nested_key[0]] = {}
+                if nested_key[1] not in self._arrays[nested_key[0]]:
+                    self._arrays[nested_key[0]][nested_key[1]] = {}
                 # Store the data
-                print(f"Storing data for key: {k}, shape of arr: {arr.shape}")
-                self._arrays[k][self._idx:idx_hi] = arr
+                print(f"Storing data for key: {nested_key}, shape of arr: {arr.shape}")
+                self._arrays[nested_key[0]][nested_key[1]][self._idx:idx_hi] = arr
             else:
                 # Regular handling for single keys
+                if k not in self._arrays:
+                    self._arrays[k] = {}
                 print(f"Storing data for key: {k}, shape of arr: {arr.shape}")
                 self._arrays[k][self._idx:idx_hi] = arr
         self._idx = idx_hi % self.capacity

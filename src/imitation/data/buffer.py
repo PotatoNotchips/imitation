@@ -223,7 +223,8 @@ class Buffer:
                     print("arr after the first round stored samples: ", arr)
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
-                            self._store_easy({f"{k}.{sub_k}": sub_arr[:n_remain]})
+                            nested_key = (k, sub_k)
+                            self._store_easy({nested_key: sub_arr[:n_remain]})
                     else:
                         self._store_easy({k: arr[:n_remain]})
     
@@ -234,7 +235,8 @@ class Buffer:
                     print("arr after the first round stored samples and assert: ", arr)
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
-                            self._store_easy({f"{k}.{sub_k}": sub_arr[n_remain:]})
+                            nested_key = (k, sub_k)
+                            self._store_easy({nested_key: sub_arr[n_remain:]})
                     else:
                         self._store_easy({k: arr[n_remain:]})
             else:
@@ -268,7 +270,20 @@ class Buffer:
         assert n_samples <= self.capacity - self._idx
         idx_hi = self._idx + n_samples
         for k, arr in data.items():
-            self._arrays[k][self._idx : idx_hi] = arr
+            # Ensure k is treated as a tuple for nested keys
+            if isinstance(k, tuple):
+                # Handle nested structure
+                full_key = k  # You may need to adapt this depending on how you store nested arrays
+                print(f"Storing data for nested key: {full_key}, shape of arr: {arr.shape}")
+                # Ensure the target structure exists
+                if full_key not in self._arrays:
+                    raise KeyError(f"Key {full_key} not found in buffer arrays: {list(self._arrays.keys())}")
+                # Store the data
+                self._arrays[full_key][self._idx:idx_hi] = arr
+            else:
+                # Regular handling for single keys
+                print(f"Storing data for key: {k}, shape of arr: {arr.shape}")
+                self._arrays[k][self._idx:idx_hi] = arr
         self._idx = idx_hi % self.capacity
         self._n_data = min(self._n_data + n_samples, self.capacity)
 

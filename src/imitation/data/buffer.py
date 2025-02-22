@@ -225,6 +225,8 @@ class Buffer:
                         for sub_k, sub_arr in arr.items():
                             # Store the sub-arrays directly under their nested keys
                             nested_key = (k, sub_k)  # Use a tuple for nested keys
+                            print("This is K: ",k)
+                            print("This is sub K: ",sub_k)
                             self._store_easy({nested_key: sub_arr[:n_remain]})
                     else:
                         self._store_easy({k: arr[:n_remain]})
@@ -274,6 +276,8 @@ class Buffer:
             # Ensure k is a tuple for nested keys
             if isinstance(k, tuple):
                 outer_key, inner_key = k
+                print("This is outer_key: ",outer_key)
+                print("This is inner_key: ",inner_key)
                 # Initialize nested dictionary if it does not exist
                 if outer_key not in self._arrays:
                     self._arrays[outer_key] = {}

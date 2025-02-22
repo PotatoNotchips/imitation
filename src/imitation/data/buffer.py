@@ -273,19 +273,20 @@ class Buffer:
         for k, arr in data.items():
             # Ensure k is a tuple for nested keys
             if isinstance(k, tuple):
-                nested_key = k
+                outer_key, inner_key = k
                 # Initialize nested dictionary if it does not exist
-                if nested_key[0] not in self._arrays:
-                    self._arrays[nested_key[0]] = {}
-                if nested_key[1] not in self._arrays[nested_key[0]]:
-                    self._arrays[nested_key[0]][nested_key[1]] = {}
+                if outer_key not in self._arrays:
+                    self._arrays[outer_key] = {}
+                if inner_key not in self._arrays[outer_key]:
+                    self._arrays[outer_key][inner_key] = np.empty((self.capacity, *arr.shape[1:]))  # Adjust shape as needed
+    
                 # Store the data
-                print(f"Storing data for key: {nested_key}, shape of arr: {arr.shape}")
-                self._arrays[nested_key[0]][nested_key[1]][self._idx:idx_hi] = arr
+                print(f"Storing data for key: {k}, shape of arr: {arr.shape}")
+                self._arrays[outer_key][inner_key][self._idx:idx_hi] = arr
             else:
                 # Regular handling for single keys
                 if k not in self._arrays:
-                    self._arrays[k] = {}
+                    self._arrays[k] = np.empty((self.capacity, *arr.shape[1:]))  # Adjust shape as needed
                 print(f"Storing data for key: {k}, shape of arr: {arr.shape}")
                 self._arrays[k][self._idx:idx_hi] = arr
         self._idx = idx_hi % self.capacity

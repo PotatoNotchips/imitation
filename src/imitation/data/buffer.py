@@ -273,6 +273,7 @@ class Buffer:
         assert n_samples <= self.capacity - self._idx
         idx_hi = self._idx + n_samples
         for k, arr in data.items():
+            print("This is arr: ", arr)
             # Ensure k is a tuple for nested keys
             if isinstance(k, tuple):
                 outer_key, inner_key = k

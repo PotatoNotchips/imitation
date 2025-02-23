@@ -288,7 +288,7 @@ class Buffer:
                     # If arr is a dictionary, handle each sub-array
                     for sub_key, sub_arr in arr.items():
                         if inner_key not in self._arrays[outer_key]:
-                            self._arrays[outer_key][inner_key] = np.empty((self.capacity, *sub_arr.shape[1]))  # Adjust shape as needed
+                            self._arrays[outer_key][inner_key] = np.empty((self.capacity, sub_arr.shape[1]))  # Adjust shape as needed
                         print(f"Storing data for key: ({outer_key}, {sub_key}), shape of arr: {sub_arr.shape}")
                         self._arrays[outer_key][inner_key][self._idx:idx_hi] = sub_arr
                 else:
@@ -297,7 +297,7 @@ class Buffer:
                         raise ValueError(f"Expected NumPy array for key {k}, but got {type(arr)}.")
                     
                     if inner_key not in self._arrays[outer_key]:
-                        self._arrays[outer_key][inner_key] = np.empty((self.capacity, *arr.shape[1]))  # Adjust shape as needed
+                        self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1]))  # Adjust shape as needed
                     
                     print(f"Storing data for key: {k}, shape of arr: {arr.shape}")
                     self._arrays[outer_key][inner_key][self._idx:idx_hi] = arr
@@ -305,7 +305,7 @@ class Buffer:
             else:
                 # Regular handling for single keys
                 if k not in self._arrays:
-                    self._arrays[k] = np.empty((self.capacity, *arr.shape[1]))  # Adjust shape as needed
+                    self._arrays[k] = np.empty((self.capacity, arr.shape[1]))  # Adjust shape as needed
                 
                 print(f"Storing data for key: {k}, shape of arr: {arr.shape}")
                 self._arrays[k][self._idx:idx_hi] = arr

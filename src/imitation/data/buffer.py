@@ -282,7 +282,7 @@ class Buffer:
                 if outer_key not in self._arrays:
                     self._arrays[outer_key] = {}
                 # Handle potential nested structure
-                if isinstance(arr, dict):
+                if isinstance(arr, (dict, DictObs)):
                     # If arr is a dictionary, handle each sub-array
                     for sub_key, sub_arr in arr.items():
                         if inner_key not in self._arrays[outer_key]:

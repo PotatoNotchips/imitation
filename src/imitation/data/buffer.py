@@ -272,6 +272,7 @@ class Buffer:
         n_samples = num_samples(data)
         assert n_samples <= self.capacity - self._idx
         idx_hi = self._idx + n_samples
+        print("This is the type of _array: ", type(self._arrays))
         for k, arr in data.items():
             print("This is arr: ", arr)
             print("This is shape of arr: ", arr.shape)

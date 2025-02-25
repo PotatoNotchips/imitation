@@ -313,7 +313,8 @@ class Buffer:
                     # If arr is a dictionary, handle each sub-array
                     for sub_key, sub_arr in arr.items():
                         if sub_key not in self._arrays[k]:
-                            self._arrays[k][sub_key] = np.empty((self.capacity, sub_arr.shape[1]))  # Adjust shape as needed
+                            print("Adding this subkey: ",sub_key)
+                            self._arrays[k].update({sub_key: np.empty((self.capacity, sub_arr.shape[1]))})
                         print(f"Storing data for key: ({k}, {sub_key}), shape of arr: {sub_arr.shape}")
                         self._arrays[k][sub_key][self._idx:idx_hi] = sub_arr
                 else:              

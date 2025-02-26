@@ -290,7 +290,13 @@ class Buffer:
                     # If arr is a dictionary, handle each sub-array
                     for sub_key, sub_arr in arr.items():
                         if inner_key not in self._arrays[outer_key]:
-                            self._arrays[outer_key][inner_key] = np.empty((self.capacity, sub_arr.shape[1]))  # Adjust shape as needed
+                        # Initialize the inner_key with an empty array based on the shape of arr
+                        if arr.ndim == 2:
+                            self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1]))
+                        elif arr.ndim == 3:
+                            self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1], arr.shape[2]))
+                        else:
+                            raise ValueError(f"Unexpected array dimension {arr.ndim} for key {k}.")
                         print(f"Storing data for key: ({outer_key}, {sub_key}), shape of arr: {sub_arr.shape}")
                         self._arrays[outer_key][inner_key][self._idx:idx_hi] = sub_arr
                 else:
@@ -316,7 +322,13 @@ class Buffer:
                             print("Adding this subkey: ",sub_key)
                             print("Checking the type of _arrays[k]: ",type(self._arrays[k]))
                             print("This is the arrays[k]: ",self._arrays[k])
+                        # Adjust shape based on sub_arr dimension
+                        if sub_arr.ndim == 2:
                             self._arrays[k].update({sub_key: np.empty((self.capacity, sub_arr.shape[1]))})
+                        elif sub_arr.ndim == 3:
+                            self._arrays[k].update({sub_key: np.empty((self.capacity, sub_arr.shape[1], sub_arr.shape[2]))})
+                        else:
+                            raise ValueError(f"Unexpected array dimension {sub_arr.ndim} for key {sub_key}.")
                         print(f"Storing data for key: ({k}, {sub_key}), shape of arr: {sub_arr.shape}")
                         self._arrays[k][sub_key][self._idx:idx_hi] = sub_arr
                 else:              

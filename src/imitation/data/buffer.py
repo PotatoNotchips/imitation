@@ -306,7 +306,7 @@ class Buffer:
     
             else:
                 # Regular handling for single keys
-                if k not in self._arrays:
+                if k not in self._arrays or isinstance(self._arrays[k], np.ndarray):
                     self._arrays[k] = {}
 
                 if isinstance(arr, (dict, DictObs)):
@@ -315,6 +315,7 @@ class Buffer:
                         if sub_key not in self._arrays[k]:
                             print("Adding this subkey: ",sub_key)
                             print("Checking the type of _arrays[k]: ",type(self._arrays[k]))
+                            print("This is the arrays[k]: ",self._arrays[k])
                             self._arrays[k].update({sub_key: np.empty((self.capacity, sub_arr.shape[1]))})
                         print(f"Storing data for key: ({k}, {sub_key}), shape of arr: {sub_arr.shape}")
                         self._arrays[k][sub_key][self._idx:idx_hi] = sub_arr

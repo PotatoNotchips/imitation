@@ -290,7 +290,7 @@ class Buffer:
                     # If arr is a dictionary, handle each sub-array
                     for sub_key, sub_arr in arr.items():
                         if inner_key not in self._arrays[outer_key]:
-                            # Initialize the inner_key with an empty array based on the shape of arr
+                            print("Adding this inner_key: ", inner_key)
                             if arr.ndim == 2:
                                 self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1]))
                             elif arr.ndim == 3:

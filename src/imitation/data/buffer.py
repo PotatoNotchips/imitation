@@ -313,7 +313,7 @@ class Buffer:
     
             else:
                 # Regular handling for single keys
-                if k not in self._arrays or isinstance(self._arrays[k], np.ndarray):
+                if k not in self._arrays or isinstance(self._arrays["obs"], np.ndarray):
                     self._arrays[k] = {}
 
                 if isinstance(arr, (dict, DictObs)):

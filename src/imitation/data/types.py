@@ -525,16 +525,29 @@ class TransitionsMinimal(th_data.Dataset, Sequence[Mapping[str, np.ndarray]]):
             if isinstance(val, np.ndarray):
                 val.setflags(write=False)
 
-        if len(self.obs) != len(self.acts):
+        # Check if obs and acts have the same number of timesteps
+        obs_length = None
+        
+        # Handle obs in nested structure
+        if isinstance(self.obs, dict):
+            # Get the length of the first observation (assuming they all have the same length)
+            obs_length = len(next(iter(self.obs.values())))
+        elif isinstance(self.obs, np.ndarray):
+            obs_length = len(self.obs)
+        
+        # Perform the same check for acts
+        acts_length = len(self.acts)
+        
+        if obs_length != acts_length:
             raise ValueError(
                 "obs and acts must have same number of timesteps: "
-                f"{len(self.obs)} != {len(self.acts)}",
+                f"{obs_length} != {acts_length}",
             )
 
-        if len(self.infos) != len(self.obs):
+        if len(self.infos) != obs_length:
             raise ValueError(
                 "obs and infos must have same number of timesteps: "
-                f"{len(self.obs)} != {len(self.infos)}",
+                f"{obs_length} != {len(self.infos)}",
             )
 
     # TODO(adam): uncomment below once pytype bug fixed in

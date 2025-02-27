@@ -313,7 +313,10 @@ class Buffer:
     
             else:
                 # Regular handling for single keys
-                if k not in self._arrays or isinstance(self._arrays["obs"], np.ndarray) or isinstance(self._arrays["next_obs"], np.ndarray):
+                if k not in self._arrays:
+                    self._arrays[k] = np.empty((self.capacity, arr.shape[1]))
+
+                if isinstance(self._arrays["obs"], np.ndarray) or isinstance(self._arrays["next_obs"], np.ndarray):
                     self._arrays[k] = {}
 
                 if isinstance(arr, (dict, DictObs)):

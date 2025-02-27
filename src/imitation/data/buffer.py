@@ -361,7 +361,19 @@ class Buffer:
         if self.size() == 0:
             raise ValueError("Buffer is empty")
         ind = np.random.randint(self.size(), size=n_samples)
-        return {k: buffer[ind] for k, buffer in self._arrays.items()}
+        
+        sampled_data = {}
+    
+        for k, buffer in self._arrays.items():
+            if isinstance(buffer, dict):
+                # If buffer is a dictionary, handle nested keys
+                sampled_data[k] = {sub_key: buffer[sub_key][ind] for sub_key in buffer}
+            else:
+                # If buffer is not a dictionary, just slice it
+                sampled_data[k] = buffer[ind]
+    
+        return sampled_data
+        # return {k: buffer[ind] for k, buffer in self._arrays.items()}
 
     def size(self) -> int:
         """Returns the number of samples stored in the buffer."""

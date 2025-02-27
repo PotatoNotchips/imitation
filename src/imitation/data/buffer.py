@@ -334,6 +334,8 @@ class Buffer:
                             print(f"Storing data for key: ({k}, {sub_key}), shape of arr: {sub_arr.shape}, type of arr: {type(sub_arr)}")
                             self._arrays[k][sub_key][self._idx:idx_hi] = sub_arr
                 else:
+                    print("Checking the type of _arrays[k]: ",type(self._arrays[k]))
+                    print("This is the arrays[k]: ",self._arrays[k])
                     print(f"Storing data for key: {k}, shape of arr: {arr.shape}, type of arr: {type(arr)}")
                     self._arrays[k][self._idx:idx_hi] = arr
         self._idx = idx_hi % self.capacity

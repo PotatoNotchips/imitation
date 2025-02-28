@@ -531,7 +531,7 @@ class TransitionsMinimal(th_data.Dataset, Sequence[Mapping[str, np.ndarray]]):
         print("This is the type of self.obs: ", type(self.obs))
         print("This is the self.obs: ", self.obs)
         # Handle obs in nested structure
-        if isinstance(self.obs, dict):
+        if isinstance(self.obs, (dict, DictObs)):
             # Get the length of the first observation (assuming they all have the same length)
             obs_length = len(next(iter(self.obs.values())))
         elif isinstance(self.obs, np.ndarray):

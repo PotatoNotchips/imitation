@@ -575,12 +575,22 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             gen_samples_dataclass = self._gen_replay_buffer.sample(batch_size)
             gen_samples = types.dataclass_quick_asdict(gen_samples_dataclass)
 
-        if not (len(gen_samples["obs"]) == len(expert_samples["obs"]) == batch_size):
+        if isinstance(gen_samples["obs"], (dict, DictObs)):
+            gen_obs_len = len(next(iter(gen_samples["obs"].values())))
+        else:
+            gen_obs_len = len(gen_samples["obs"])
+        
+        if isinstance(expert_samples["obs"], (dict, DictObs)):
+            expert_obs_len = len(next(iter(expert_samples["obs"].values())))
+        else:
+            expert_obs_len = len(expert_samples["obs"])
+        
+        if not (gen_obs_len == expert_obs_len) == batch_size):
             raise ValueError(
                 "Need to have exactly `demo_batch_size` number of expert and "
                 "generator samples, each. "
-                f"(n_gen={len(gen_samples['obs'])} "
-                f"n_expert={len(expert_samples['obs'])} "
+                f"(n_gen={gen_obs_len} "
+                f"n_expert={expert_obs_len} "
                 f"demo_batch_size={batch_size})",
             )
 
@@ -596,25 +606,60 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             for d in [gen_samples, expert_samples]:
                 if isinstance(d[k], th.Tensor):
                     d[k] = d[k].detach().numpy()
-        assert isinstance(gen_samples["obs"], np.ndarray)
-        assert isinstance(expert_samples["obs"], np.ndarray)
+                    
+        if isinstance(gen_samples["obs"], (dict, DictObs)):
+            for sub_key in gen_samples["obs"]:
+                assert isinstance(gen_samples["obs"][sub_key], np.ndarray)
+        else:
+            assert isinstance(gen_samples["obs"], np.ndarray)           
+        if isinstance(expert_samples["obs"], (dict, DictObs)):
+            for sub_key in expert_samples["obs"]:
+                assert isinstance(expert_samples["obs"][sub_key], np.ndarray)            
+        else:
+            assert isinstance(expert_samples["obs"], np.ndarray)
 
         # Check dimensions.
+        if isinstance(gen_samples["next_obs"], (dict, DictObs)):
+            for sub_key in gen_samples["next_obs"]:
+                assert isinstance(gen_samples["next_obs"][sub_key], np.ndarray), f"gen_samples['next_obs']['{sub_key}'] must be a numpy array"
+            gen_next_obs_len = len(next(iter(gen_samples["next_obs"].values())))
+            assert batch_size == gen_next_obs_len
+        else:
+            assert isinstance(gen_samples["next_obs"], np.ndarray)
+            assert batch_size == len(gen_samples["next_obs"])
+        if isinstance(expert_samples["next_obs"], (dict, DictObs)):
+            for sub_key in expert_samples["next_obs"]:
+                assert isinstance(expert_samples["next_obs"][sub_key], np.ndarray), f"expert_samples['next_obs']['{sub_key}'] must be a numpy array"
+            expert_next_obs_len = len(next(iter(expert_samples["next_obs"].values())))
+            assert batch_size == expert_next_obs_len
+        else:
+            assert isinstance(expert_samples["next_obs"], np.ndarray)
+            assert batch_size == len(expert_samples["next_obs"])
         assert batch_size == len(expert_samples["acts"])
-        assert batch_size == len(expert_samples["next_obs"])
         assert batch_size == len(gen_samples["acts"])
-        assert batch_size == len(gen_samples["next_obs"])
 
         for start in range(0, batch_size, self.demo_minibatch_size):
             end = start + self.demo_minibatch_size
             # take minibatch slice (this creates views so no memory issues)
-            expert_batch = {k: v[start:end] for k, v in expert_samples.items()}
-            gen_batch = {k: v[start:end] for k, v in gen_samples.items()}
+            expert_batch = {
+                k: {sub_k: sub_v[start:end] for sub_k, sub_v in v.items()} if isinstance(v, (dict, DictObs)) else v[start:end]
+                for k, v in expert_samples.items()
+            }
+            gen_batch = {
+                k: {sub_k: sub_v[start:end] for sub_k, sub_v in v.items()} if isinstance(v, (dict, DictObs)) else v[start:end]
+                for k, v in gen_samples.items()
+            }
 
             # Concatenate rollouts, and label each row as expert or generator.
-            obs = np.concatenate([expert_batch["obs"], gen_batch["obs"]])
+            if isinstance(expert_batch["obs"], (dict, DictObs)):
+                obs = {k: np.concatenate([expert_batch["obs"][k], gen_batch["obs"][k]]) for k in expert_batch["obs"]}
+            else:
+                obs = np.concatenate([expert_batch["obs"], gen_batch["obs"]])
+            if isinstance(expert_batch["next_obs"], (dict, DictObs)):
+                next_obs = {k: np.concatenate([expert_batch["next_obs"][k], gen_batch["next_obs"][k]]) for k in expert_batch["next_obs"]}
+            else:
+                next_obs = np.concatenate([expert_batch["next_obs"], gen_batch["next_obs"]])
             acts = np.concatenate([expert_batch["acts"], gen_batch["acts"]])
-            next_obs = np.concatenate([expert_batch["next_obs"], gen_batch["next_obs"]])
             dones = np.concatenate([expert_batch["dones"], gen_batch["dones"]])
             # notice that the labels use the convention that expert samples are
             # labelled with 1 and generator samples with 0.

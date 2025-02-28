@@ -585,7 +585,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         else:
             expert_obs_len = len(expert_samples["obs"])
         
-        if not (gen_obs_len == expert_obs_len) == batch_size):
+        if not ((gen_obs_len == expert_obs_len) == batch_size):
             raise ValueError(
                 "Need to have exactly `demo_batch_size` number of expert and "
                 "generator samples, each. "

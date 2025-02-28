@@ -617,8 +617,6 @@ class Transitions(TransitionsMinimal):
         # Check if obs and next_obs are dictionaries
         if isinstance(self.obs, (dict, DictObs)) and isinstance(self.next_obs, (dict, DictObs)):
             for key in self.obs:
-                if key not in self.next_obs:
-                    raise ValueError(f"Key '{key}' found in obs but not in next_obs")
                 if self.obs[key].shape != self.next_obs[key].shape:
                     raise ValueError(
                         f"Shape mismatch for key '{key}': "

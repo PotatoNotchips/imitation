@@ -615,29 +615,16 @@ class Transitions(TransitionsMinimal):
         """Performs input validation: check shapes & dtypes match docstring."""
         super().__post_init__()
         '''
-        # Check if obs and next_obs are dictionaries
-        if isinstance(self.obs, (dict, DictObs)) and isinstance(self.next_obs, (dict, DictObs)):
-            if self.obs.values().shape != self.next_obs.values().shape:
-                raise ValueError(
-                    f"Shape mismatch for key '{key}': "
-                    f"obs shape {self.obs.values().shape} != next_obs shape {self.next_obs.values().shape}"
-                )
-            if self.obs.values().dtype != self.next_obs.values().dtype:
-                raise ValueError(
-                    "obs and next_obs must have the same dtype: "
-                    f"{self.obs.values().dtype} != {self.next_obs.values().dtype}",
-                )
-        else:
-            if self.obs.shape != self.next_obs.shape:
-                raise ValueError(
-                    "obs and next_obs must have same shape: "
-                    f"{self.obs.shape} != {self.next_obs.shape}",
-                )
-            if self.obs.dtype != self.next_obs.dtype:
-                raise ValueError(
-                    "obs and next_obs must have the same dtype: "
-                    f"{self.obs.dtype} != {self.next_obs.dtype}",
-                )
+        if self.obs.shape != self.next_obs.shape:
+            raise ValueError(
+                "obs and next_obs must have same shape: "
+                f"{self.obs.shape} != {self.next_obs.shape}",
+            )
+        if self.obs.dtype != self.next_obs.dtype:
+            raise ValueError(
+                "obs and next_obs must have the same dtype: "
+                f"{self.obs.dtype} != {self.next_obs.dtype}",
+            )
         '''
         if self.dones.shape != (len(self.acts),):
             raise ValueError(

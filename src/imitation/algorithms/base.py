@@ -305,6 +305,7 @@ def make_data_loader(
         # Safe to ignore this error since we've already converted Iterable[Trajectory]
         # `transitions` into Iterable[TransitionMapping]
         print("Using Wrapped Dataloader method to pack")
+        print("This is the wrappeddataloader result: ", _WrappedDataLoader(transitions, batch_size))
         return _WrappedDataLoader(transitions, batch_size)  # type: ignore[arg-type]
     else:
         raise TypeError(f"`demonstrations` unexpected type {type(transitions)}")

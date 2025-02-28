@@ -528,8 +528,6 @@ class TransitionsMinimal(th_data.Dataset, Sequence[Mapping[str, np.ndarray]]):
         # Check if obs and acts have the same number of timesteps
         obs_length = None
 
-        print("This is the type of self.obs: ", type(self.obs))
-        print("This is the self.obs: ", self.obs)
         # Handle obs in nested structure
         if isinstance(self.obs, (dict, DictObs)):
             # Get the length of the first observation (assuming they all have the same length)

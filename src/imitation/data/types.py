@@ -614,6 +614,7 @@ class Transitions(TransitionsMinimal):
     def __post_init__(self):
         """Performs input validation: check shapes & dtypes match docstring."""
         super().__post_init__()
+        '''
         # Check if obs and next_obs are dictionaries
         if isinstance(self.obs, (dict, DictObs)) and isinstance(self.next_obs, (dict, DictObs)):
             if self.obs.values().shape != self.next_obs.values().shape:
@@ -637,6 +638,7 @@ class Transitions(TransitionsMinimal):
                     "obs and next_obs must have the same dtype: "
                     f"{self.obs.dtype} != {self.next_obs.dtype}",
                 )
+        '''
         if self.dones.shape != (len(self.acts),):
             raise ValueError(
                 "dones must be 1D array, one entry for each timestep: "

@@ -294,6 +294,7 @@ def make_data_loader(
             "drop_last": True,
             **(data_loader_kwargs or {}),
         }
+        print("Using th_data Dataloader method to pack")
         return th_data.DataLoader(
             transitions,
             batch_size=batch_size,
@@ -303,6 +304,7 @@ def make_data_loader(
     elif isinstance(transitions, Iterable):
         # Safe to ignore this error since we've already converted Iterable[Trajectory]
         # `transitions` into Iterable[TransitionMapping]
+        print("Using Wrapped Dataloader method to pack")
         return _WrappedDataLoader(transitions, batch_size)  # type: ignore[arg-type]
     else:
         raise TypeError(f"`demonstrations` unexpected type {type(transitions)}")

@@ -614,16 +614,32 @@ class Transitions(TransitionsMinimal):
     def __post_init__(self):
         """Performs input validation: check shapes & dtypes match docstring."""
         super().__post_init__()
-        if self.obs.shape != self.next_obs.shape:
-            raise ValueError(
-                "obs and next_obs must have same shape: "
-                f"{self.obs.shape} != {self.next_obs.shape}",
-            )
-        if self.obs.dtype != self.next_obs.dtype:
-            raise ValueError(
-                "obs and next_obs must have the same dtype: "
-                f"{self.obs.dtype} != {self.next_obs.dtype}",
-            )
+        # Check if obs and next_obs are dictionaries
+        if isinstance(self.obs, (dict, DictObs)) and isinstance(self.next_obs, (dict, DictObs)):
+            for key in self.obs:
+                if key not in self.next_obs:
+                    raise ValueError(f"Key '{key}' found in obs but not in next_obs")
+                if self.obs[key].shape != self.next_obs[key].shape:
+                    raise ValueError(
+                        f"Shape mismatch for key '{key}': "
+                        f"obs shape {self.obs[key].shape} != next_obs shape {self.next_obs[key].shape}"
+                    )
+                if self.obs[key].dtype != self.next_obs[key].dtype:
+                    raise ValueError(
+                        "obs and next_obs must have the same dtype: "
+                        f"{self.obs[key].dtype} != {self.next_obs[key].dtype}",
+                    )
+        else:
+            if self.obs.shape != self.next_obs.shape:
+                raise ValueError(
+                    "obs and next_obs must have same shape: "
+                    f"{self.obs.shape} != {self.next_obs.shape}",
+                )
+            if self.obs.dtype != self.next_obs.dtype:
+                raise ValueError(
+                    "obs and next_obs must have the same dtype: "
+                    f"{self.obs.dtype} != {self.next_obs.dtype}",
+                )
         if self.dones.shape != (len(self.acts),):
             raise ValueError(
                 "dones must be 1D array, one entry for each timestep: "

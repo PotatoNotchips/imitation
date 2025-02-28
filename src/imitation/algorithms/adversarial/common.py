@@ -456,7 +456,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             for _ in range(self.n_disc_updates_per_round):
                 with networks.training(self.reward_train):
                     # switch to training mode (affects dropout, normalization)
-                    self.train_disc(expert_samples=self.set_demonstrations(demonstrations))
+                    self.train_disc()
             if callback:
                 callback(r)
             self.logger.dump(self._global_step)

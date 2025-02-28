@@ -616,21 +616,16 @@ class Transitions(TransitionsMinimal):
         super().__post_init__()
         # Check if obs and next_obs are dictionaries
         if isinstance(self.obs, (dict, DictObs)) and isinstance(self.next_obs, (dict, DictObs)):
-            for key in self.obs:
-                print("This is the key: ", key)
-                print("This is self.obs: ", self.obs)
-                print("This is self.obs[key]: ", self.obs[key])
-                print("This is self.next_obs[key]: ", self.next_obs[key])
-                if self.obs[key].shape != self.next_obs[key].shape:
-                    raise ValueError(
-                        f"Shape mismatch for key '{key}': "
-                        f"obs shape {self.obs[key].shape} != next_obs shape {self.next_obs[key].shape}"
-                    )
-                if self.obs[key].dtype != self.next_obs[key].dtype:
-                    raise ValueError(
-                        "obs and next_obs must have the same dtype: "
-                        f"{self.obs[key].dtype} != {self.next_obs[key].dtype}",
-                    )
+            if self.obs.values().shape != self.next_obs.values().shape:
+                raise ValueError(
+                    f"Shape mismatch for key '{key}': "
+                    f"obs shape {self.obs.values().shape} != next_obs shape {self.next_obs.values().shape}"
+                )
+            if self.obs.values().dtype != self.next_obs.values().dtype:
+                raise ValueError(
+                    "obs and next_obs must have the same dtype: "
+                    f"{self.obs.values().dtype} != {self.next_obs.values().dtype}",
+                )
         else:
             if self.obs.shape != self.next_obs.shape:
                 raise ValueError(

@@ -358,17 +358,15 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 # Randomly select indices for expert samples
                 random_indices = np.random.choice(expert_samples_len, self.demo_batch_size, replace=False)
                 
-                # Assuming expert_samples["obs"] is the nested key
+                # Assuming expert_samples["obs"] is a list
                 if isinstance(expert_samples_for_train, dict) and "obs" in expert_samples_for_train:
-                    # Randomly slice the nested "obs" key
-                    expert_samples_for_train["obs"] = {
-                        k: v[random_indices] for k, v in expert_samples_for_train["obs"].items()
-                    }
+                    # Randomly slice the nested "obs" key if it's a list
+                    expert_samples_for_train["obs"] = [expert_samples_for_train["obs"][i] for i in random_indices]
                 
                 # Randomly slice other keys in expert_samples directly
                 for key in expert_samples_for_train:
                     if key != "obs":
-                        expert_samples_for_train[key] = expert_samples_for_train[key][random_indices]
+                        expert_samples_for_train[key] = [expert_samples_for_train[key][i] for i in random_indices]
 
             batch_iter = self._make_disc_train_batches(
                 gen_samples=gen_samples,

@@ -345,24 +345,17 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
 
             # compute loss
             self._disc_opt.zero_grad()
-
-            batch_iter = self._make_disc_train_batches(
-                gen_samples=gen_samples,
-                expert_samples=expert_samples,
-            )
             
             expert_samples_for_train = expert_samples
             
-            # Assuming expert_samples is a dictionary with a nested structure
-            gen_samples_len = len(gen_samples)
             expert_samples_len = len(expert_samples_for_train)
             
             # Check if lengths match
-            if expert_samples_len != gen_samples_len:
-                print(f"Adjusting expert samples from {expert_samples_len} to {gen_samples_len}.")
+            if expert_samples_len != self.demo_batch_size:
+                print(f"Adjusting expert samples from {expert_samples_len} to {self.demo_batch_size}.")
                 
                 # Randomly select indices for expert samples
-                random_indices = np.random.choice(expert_samples_len, gen_samples_len, replace=False)
+                random_indices = np.random.choice(expert_samples_len, self.demo_batch_size, replace=False)
                 
                 # Assuming expert_samples["obs"] is the nested key
                 if isinstance(expert_samples_for_train, dict) and "obs" in expert_samples_for_train:

@@ -346,6 +346,11 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             # compute loss
             self._disc_opt.zero_grad()
 
+            batch_iter = self._make_disc_train_batches(
+                gen_samples=gen_samples,
+                expert_samples=expert_samples,
+            )
+            
             expert_samples_for_train = expert_samples
             
             # Assuming expert_samples is a dictionary with a nested structure

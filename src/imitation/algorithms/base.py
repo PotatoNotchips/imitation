@@ -283,7 +283,7 @@ def make_data_loader(
             transitions = rollout.flatten_trajectories(list(transitions))
 
     if isinstance(transitions, (types.TransitionsMinimal, dict)):
-        if len(transitions) < batch_size:
+        if len(transitions["acts"]) < batch_size:
             raise ValueError(
                 f"Number of transitions in `demonstrations` {len(transitions)} "
                 f"is smaller than batch size {batch_size}.",

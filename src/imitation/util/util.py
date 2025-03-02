@@ -237,8 +237,6 @@ def endless_iter(iterable: Iterable[T]) -> Iterator[T]:
     if iter(iterable) == iterable:
         raise ValueError("endless_iter needs a non-iterator Iterable.")
 
-    print("This is the type of iterable in the endless_iter function: ", type(iterable))
-    print("This is the iterable in the endless_iter function: ", iterable)
     _, iterable = get_first_iter_element(iterable)
     return itertools.chain.from_iterable(itertools.repeat(iterable))
 
@@ -359,8 +357,7 @@ def get_first_iter_element(iterable: Iterable[T]) -> Tuple[T, Iterable[T]]:
         ValueError: `iterable` is empty -- the first call to it returns no elements.
     """
     iterator = iter(iterable)
-    print("This is the type of iterator after the first line of get first function: ", type(iterator))
-    print("This is the iterator after the first line of get first function: ", iterator)
+
     try:
         first_element = next(iterator)
     except StopIteration:

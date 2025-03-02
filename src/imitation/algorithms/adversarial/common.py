@@ -349,7 +349,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             
             expert_samples_for_train = self.demonstrations
             
-            expert_samples_len = len(expert_samples_for_train)
+            expert_samples_len = len(expert_samples_for_train["acts"])
             
             # Check if lengths match
             if expert_samples_len != self.demo_batch_size:

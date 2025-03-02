@@ -188,6 +188,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         Raises:
             ValueError: if the batch size is not a multiple of the minibatch size.
         """
+        self.demonstrations = demonstrations
         self.demo_batch_size = demo_batch_size
         self.demo_minibatch_size = demo_minibatch_size or demo_batch_size
         if self.demo_batch_size % self.demo_minibatch_size != 0:
@@ -346,7 +347,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             # compute loss
             self._disc_opt.zero_grad()
             
-            expert_samples_for_train = expert_samples
+            expert_samples_for_train = self.demonstrations
             
             expert_samples_len = len(expert_samples_for_train)
             

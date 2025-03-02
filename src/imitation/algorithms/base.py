@@ -210,7 +210,8 @@ class _WrappedDataLoader:
             ValueError: `self.data_loader` returns a batch of size not equal to
                 `self.expected_batch_size`.
         """
-        print("The following is the data_loader type: ", type(self.data_loader))
+        print("The following is the data_loader type in wrapped dataloader function: ", type(self.data_loader))
+        print("The following is the data_loader in wrapped dataloader function: ", self.data_loader)
         if isinstance(self.data_loader, dict):
             batch = self.data_loader
             self.expected_batch_size = len(batch["obs"])
@@ -282,7 +283,7 @@ def make_data_loader(
             transitions = cast(Iterable[types.Trajectory], transitions)
             transitions = rollout.flatten_trajectories(list(transitions))
 
-    if isinstance(transitions, (types.TransitionsMinimal, dict)):
+    if isinstance(transitions, types.TransitionsMinimal):
         if len(transitions["acts"]) < batch_size:
             raise ValueError(
                 f"Number of transitions in `demonstrations` {len(transitions)} "

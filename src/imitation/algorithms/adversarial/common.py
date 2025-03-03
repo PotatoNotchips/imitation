@@ -309,7 +309,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             demonstrations,
             self.demo_batch_size,
         )
-        print("This is the demon passed to the data loader function: ", type(self._demo_data_loader))
+
         self._endless_expert_iterator = util.endless_iter(self._demo_data_loader)
 
     def _next_expert_batch(self) -> Mapping:
@@ -353,7 +353,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             
             # Check if lengths match
             if expert_samples_len != self.demo_batch_size:
-                print(f"Adjusting expert samples from {expert_samples_len} to {self.demo_batch_size}.")
                 
                 # Randomly select indices for expert samples
                 random_indices = np.random.choice(expert_samples_len, self.demo_batch_size, replace=False)
@@ -609,6 +608,10 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             if k == "infos":
                 continue
             for d in [gen_samples, expert_samples]:
+                print("This is the k: ", k)
+                print("This is the d: ", d)
+                print("This is the type of d[k]: ", type(d[k]))
+                print("This is the d[k]: ", d[k])
                 if isinstance(d[k], th.Tensor):
                     d[k] = d[k].detach().numpy()
                     

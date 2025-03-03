@@ -602,16 +602,15 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         expert_samples = dict(expert_samples)
         gen_samples = dict(gen_samples)
 
+        print("Keys in gen_samples:", list(gen_samples.keys()))
+        print("Keys in expert_samples:", list(expert_samples.keys()))
+        
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):
             k = field.name
             if k == "infos":
                 continue
             for d in [gen_samples, expert_samples]:
-                print("This is the k: ", k)
-                print("This is the d: ", d)
-                print("This is the type of d[k]: ", type(d[k]))
-                print("This is the d[k]: ", d[k])
                 if isinstance(d[k], th.Tensor):
                     d[k] = d[k].detach().numpy()
                     

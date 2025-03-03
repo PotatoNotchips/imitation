@@ -616,6 +616,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
 
         print("Type of gen samples obs: ", type(gen_samples["obs"]))
         print("Type of expert samples obs: ", type(expert_samples["obs"]))
+        print("This is the expert samples obs: ", expert_samples["obs"])
         print("Type of gen samples next obs: ", type(gen_samples["next_obs"]))
         print("Type of expert samples next obs: ", type(gen_samples["next_obs"]))
 

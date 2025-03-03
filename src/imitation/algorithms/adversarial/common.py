@@ -584,6 +584,13 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             expert_obs_len = len(next(iter(expert_samples["obs"].values())))
         else:
             expert_obs_len = len(expert_samples["obs"])
+
+        print(f"Generator samples length: {len(gen_samples)}")
+        print(f"Expert samples length: {len(expert_samples)}")
+        print(f"Generator samples type: {type(gen_samples)}")
+        print(f"Expert samples type: {type(expert_samples)}")
+        print(f"Generator samples: {gen_samples}")
+        print(f"Expert samples: {expert_samples}")
         
         if not ((gen_obs_len == expert_obs_len) == batch_size):
             raise ValueError(

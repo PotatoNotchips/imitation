@@ -588,11 +588,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         else:
             expert_obs_len = len(expert_obs)
 
-        print(f"Generator obs samples length: {gen_obs_len}")
-        print(f"Expert obs samples length: {expert_obs_len}")
-        print(f"Generator samples type: {type(gen_samples)}")
-        print(f"Expert samples type: {type(expert_samples)}")
-        
+        '''
         if not ((gen_obs_len == expert_obs_len) == batch_size):
             raise ValueError(
                 "Need to have exactly `demo_batch_size` number of expert and "
@@ -601,6 +597,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 f"n_expert={expert_obs_len} "
                 f"demo_batch_size={batch_size})",
             )
+        '''
 
         # Guarantee that Mapping arguments are in mutable form.
         expert_samples = dict(expert_samples)

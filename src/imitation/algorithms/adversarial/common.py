@@ -613,7 +613,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             for d in [gen_samples, expert_samples]:
                 if isinstance(d[k], th.Tensor):
                     d[k] = d[k].detach().numpy()
-                    
+
+        print("Type of gen samples obs: ", type(gen_samples["obs"]))
+        print("Type of expert samples obs: ", type(expert_samples["obs"]))
+        print("Type of gen samples next obs: ", type(gen_samples["next_obs"]))
+        print("Type of expert samples next obs: ", type(gen_samples["next_obs"]))
+
         if isinstance(gen_samples["obs"], dict):
             for sub_key in gen_samples["obs"]:
                 assert isinstance(gen_samples["obs"][sub_key], np.ndarray)

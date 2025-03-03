@@ -575,15 +575,18 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             gen_samples_dataclass = self._gen_replay_buffer.sample(batch_size)
             gen_samples = types.dataclass_quick_asdict(gen_samples_dataclass)
 
-        if isinstance(gen_samples["obs"], dict):
-            gen_obs_len = len(next(iter(gen_samples["obs"].values())))
-        else:
-            gen_obs_len = len(gen_samples["obs"])
+        gen_obs = gen_samples["obs"]
+        expert_obs = expert_samples["obs"]
         
-        if isinstance(expert_samples["obs"], dict):
-            expert_obs_len = len(next(iter(expert_samples["obs"].values())))
+        if isinstance(gen_obs, dict):
+            gen_obs_len = len(gen_obs[list(gen_obs.keys())[0]])
         else:
-            expert_obs_len = len(expert_samples["obs"])
+            gen_obs_len = len(gen_obs)
+    
+        if isinstance(expert_obs, dict):
+            expert_obs_len = len(expert_obs[list(expert_obs.keys())[0]])
+        else:
+            expert_obs_len = len(expert_obs)
 
         print(f"Generator obs samples length: {gen_obs_len}")
         print(f"Expert obs samples length: {expert_obs_len}")

@@ -583,9 +583,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         # Guarantee that Mapping arguments are in mutable form.
         expert_samples = dict(expert_samples)
         gen_samples = dict(gen_samples)
-
-        print("Keys in gen_samples:", list(gen_samples.keys()))
-        print("Keys in expert_samples:", list(expert_samples.keys()))
         
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):
@@ -595,12 +592,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             for d in [gen_samples, expert_samples]:
                 if isinstance(d[k], th.Tensor):
                     d[k] = d[k].detach().numpy()
-
-        print("Type of gen samples obs: ", type(gen_samples["obs"]))
-        print("Type of expert samples obs: ", type(expert_samples["obs"]))
-        print("This is the expert samples obs: ", expert_samples["obs"])
-        print("Type of gen samples next obs: ", type(gen_samples["next_obs"]))
-        print("Type of expert samples next obs: ", type(gen_samples["next_obs"]))
 
         if isinstance(gen_samples["obs"], dict):
             for sub_key in gen_samples["obs"]:
@@ -617,21 +608,35 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         if isinstance(gen_samples["next_obs"], dict):
             for sub_key in gen_samples["next_obs"]:
                 assert isinstance(gen_samples["next_obs"][sub_key], np.ndarray), f"gen_samples['next_obs']['{sub_key}'] must be a numpy array"
-            gen_next_obs_len = len(next(iter(gen_samples["next_obs"].values())))
-            assert batch_size == gen_next_obs_len
         else:
             assert isinstance(gen_samples["next_obs"], np.ndarray)
-            assert batch_size == len(gen_samples["next_obs"])
         if isinstance(expert_samples["next_obs"], dict):
             for sub_key in expert_samples["next_obs"]:
                 assert isinstance(expert_samples["next_obs"][sub_key], np.ndarray), f"expert_samples['next_obs']['{sub_key}'] must be a numpy array"
-            expert_next_obs_len = len(next(iter(expert_samples["next_obs"].values())))
-            assert batch_size == expert_next_obs_len
         else:
             assert isinstance(expert_samples["next_obs"], np.ndarray)
-            assert batch_size == len(expert_samples["next_obs"])
+
+        print("Batch Size: ", batch_size)
+        print("Expert Samples Obs Stock Obs len: ", len(expert_samples["obs"]["stock_obs"]))
+        print("Expert Samples Obs Additional info len: ", len(expert_samples["obs"]["additional_info"]))
+        print("Gen Samples Obs Stock Obs len: ", len(gen_samples["obs"]["stock_obs"]))
+        print("Gen Samples Obs Additional Info len: ", len(gen_samples["obs"]["additional_info"]))
+        print("Expert Samples Next Obs Stock Obs len: ", len(expert_samples["next_obs"]["stock_obs"]))
+        print("Expert Samples Next Obs Additional Info len: ", len(expert_samples["next_obs"]["additional_info"]))
+        print("Gen Samples Next Obs Stock Obs len: ", len(gen_samples["next_obs"]["stock_obs"]))
+        print("Gen Samples Next Obs Additional Info len: ", len(gen_samples["next_obs"]["additional_info"]))
+        print("Expert Samples Acts len: ", len(expert_samples["acts"]))
+        print("Gen Samples Acts len: ", len(gen_samples["acts"]))
         assert batch_size == len(expert_samples["acts"])
         assert batch_size == len(gen_samples["acts"])
+        assert batch_size == len(expert_samples["obs"]["stock_obs"])
+        assert batch_size == len(expert_samples["obs"]["additional_info"])
+        assert batch_size == len(gen_samples["obs"]["stock_obs"])
+        assert batch_size == len(gen_samples["obs"]["additional_info"])
+        assert batch_size == len(expert_samples["next_obs"]["stock_obs"])
+        assert batch_size == len(expert_samples["next_obs"]["additional_info"])
+        assert batch_size == len(gen_samples["next_obs"]["stock_obs"])
+        assert batch_size == len(gen_samples["next_obs"]["additional_info"])
 
         for start in range(0, batch_size, self.demo_minibatch_size):
             end = start + self.demo_minibatch_size

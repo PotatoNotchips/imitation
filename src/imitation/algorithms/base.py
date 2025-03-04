@@ -190,6 +190,7 @@ class _WrappedDataLoader:
         self,
         data_loader: Iterable[types.TransitionMapping],
         expected_batch_size: int,
+        drop_last=False
     ):
         """Builds _WrappedDataLoader.
 
@@ -199,6 +200,7 @@ class _WrappedDataLoader:
         """
         self.data_loader = data_loader
         self.expected_batch_size = expected_batch_size
+        self.drop_last = drop_last
 
     def __iter__(self) -> Iterator[types.TransitionMapping]:
         """Yields data from `self.data_loader`, checking `self.expected_batch_size`.
@@ -210,24 +212,78 @@ class _WrappedDataLoader:
             ValueError: `self.data_loader` returns a batch of size not equal to
                 `self.expected_batch_size`.
         """
-        print("The following is the data_loader type in wrapped dataloader function: ", type(self.data_loader))
-        print("The following is the data_loader in wrapped dataloader function: ", self.data_loader)
-        if isinstance(self.data_loader, dict):
-            batch = self.data_loader
-            self.expected_batch_size = len(batch["obs"])
+        total_samples = self.data_loader["obs"]["stock_obs"].shape[0]
+                for start in range(0, total_samples, self.expected_batch_size):
+                    end = start + self.expected_batch_size
+                    if end > total_samples:
+                        if self.drop_last:
+                            continue
+                        end = total_samples
+                    batch = {
+                        "obs": {
+                            "stock_obs": self.data_loader["obs"]["stock_obs"][start:end],
+                            "additional_info": self.data_loader["obs"]["additional_info"][start:end]
+                        },
+                        "acts": self.data_loader["acts"][start:end] if isinstance(self.data_loader["acts"], list) else self.data_loader["acts"][start:end],
+                        "rews": self.data_loader["rews"][start:end] if isinstance(self.data_loader["rews"], list) else self.data_loader["rews"][start:end],
+                        "dones": self.data_loader["dones"][start:end] if isinstance(self.data_loader["dones"], list) else self.data_loader["dones"][start:end],
+                        "next_obs": {
+                            "stock_obs": self.data_loader["next_obs"]["stock_obs"][start:end],
+                            "additional_info": self.data_loader["next_obs"]["additional_info"][start:end]
+                        }
+                    }
+                    is_valid, msg = self.check_batch_size(batch)
+                    if not is_valid:
+                        raise ValueError(msg)
+                    yield batch
+
+    def check_batch_size(self, batch):
+            # Get batch size from "obs"
+            obs_batch_size = batch["obs"]["stock_obs"].shape[0]
+            if obs_batch_size != self.expected_batch_size:
+                return False, f"obs batch size {obs_batch_size} != {self.expected_batch_size}"
     
-            if len(batch["obs"]) != self.expected_batch_size:
-                raise ValueError(
-                    f"Expected batch size {self.expected_batch_size} != {len(batch['obs'])}"
-                )
+            # Check "acts"
+            acts = batch["acts"]
+            if isinstance(acts, list):
+                acts_batch_size = len(acts)
+            elif isinstance(acts, np.ndarray):
+                acts_batch_size = acts.shape[0]
+            else:
+                return False, "acts must be list or numpy array"
+            if acts_batch_size != self.expected_batch_size:
+                return False, f"acts batch size {acts_batch_size} != {self.expected_batch_size}"
     
-            if len(batch["acts"]) != self.expected_batch_size:
-                raise ValueError(
-                    f"Expected batch size {self.expected_batch_size} != {len(batch['acts'])}"
-                )
+            # Check "rews"
+            rews = batch["rews"]
+            if isinstance(rews, list):
+                rews_batch_size = len(rews)
+            elif isinstance(rews, np.ndarray):
+                rews_batch_size = rews.shape[0]
+            else:
+                return False, "rews must be list or numpy array"
+            if rews_batch_size != self.expected_batch_size:
+                return False, f"rews batch size {rews_batch_size} != {self.expected_batch_size}"
     
-            yield batch
-        else:
+            # Check "dones"
+            dones = batch["dones"]
+            if isinstance(dones, list):
+                dones_batch_size = len(dones)
+            elif isinstance(dones, np.ndarray):
+                dones_batch_size = dones.shape[0]
+            else:
+                return False, "dones must be list or numpy array"
+            if dones_batch_size != self.expected_batch_size:
+                return False, f"dones batch size {dones_batch_size} != {self.expected_batch_size}"
+    
+            # Check "next_obs"
+            next_obs_batch_size = batch["next_obs"]["stock_obs"].shape[0]
+            if next_obs_batch_size != self.expected_batch_size:
+                return False, f"next_obs batch size {next_obs_batch_size} != {self.expected_batch_size}"
+    
+            return True, None
+
+            '''
             for batch in self.data_loader:
                 print("This is the batch data type: ", type(batch))
     
@@ -242,7 +298,7 @@ class _WrappedDataLoader:
                     )
     
                 yield batch
-
+                '''
 
 def make_data_loader(
     transitions: AnyTransitions,
@@ -295,7 +351,6 @@ def make_data_loader(
             "drop_last": True,
             **(data_loader_kwargs or {}),
         }
-        print("Using th_data Dataloader method to pack")
         return th_data.DataLoader(
             transitions,
             batch_size=batch_size,
@@ -305,8 +360,6 @@ def make_data_loader(
     elif isinstance(transitions, Iterable):
         # Safe to ignore this error since we've already converted Iterable[Trajectory]
         # `transitions` into Iterable[TransitionMapping]
-        print("Using Wrapped Dataloader method to pack")
-        print("This is the wrappeddataloader result: ", _WrappedDataLoader(transitions, batch_size))
         return _WrappedDataLoader(transitions, batch_size)  # type: ignore[arg-type]
     else:
         raise TypeError(f"`demonstrations` unexpected type {type(transitions)}")

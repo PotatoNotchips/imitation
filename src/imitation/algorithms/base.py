@@ -213,29 +213,29 @@ class _WrappedDataLoader:
                 `self.expected_batch_size`.
         """
         total_samples = self.data_loader["obs"]["stock_obs"].shape[0]
-            for start in range(0, total_samples, self.expected_batch_size):
-                end = start + self.expected_batch_size
-                if end > total_samples:
-                    if self.drop_last:
-                        continue
-                    end = total_samples
-                batch = {
-                    "obs": {
-                        "stock_obs": self.data_loader["obs"]["stock_obs"][start:end],
-                        "additional_info": self.data_loader["obs"]["additional_info"][start:end]
-                    },
-                    "acts": self.data_loader["acts"][start:end] if isinstance(self.data_loader["acts"], list) else self.data_loader["acts"][start:end],
-                    "rews": self.data_loader["rews"][start:end] if isinstance(self.data_loader["rews"], list) else self.data_loader["rews"][start:end],
-                    "dones": self.data_loader["dones"][start:end] if isinstance(self.data_loader["dones"], list) else self.data_loader["dones"][start:end],
-                    "next_obs": {
-                        "stock_obs": self.data_loader["next_obs"]["stock_obs"][start:end],
-                        "additional_info": self.data_loader["next_obs"]["additional_info"][start:end]
-                    }
+        for start in range(0, total_samples, self.expected_batch_size):
+            end = start + self.expected_batch_size
+            if end > total_samples:
+                if self.drop_last:
+                    continue
+                end = total_samples
+            batch = {
+                "obs": {
+                    "stock_obs": self.data_loader["obs"]["stock_obs"][start:end],
+                    "additional_info": self.data_loader["obs"]["additional_info"][start:end]
+                },
+                "acts": self.data_loader["acts"][start:end] if isinstance(self.data_loader["acts"], list) else self.data_loader["acts"][start:end],
+                "rews": self.data_loader["rews"][start:end] if isinstance(self.data_loader["rews"], list) else self.data_loader["rews"][start:end],
+                "dones": self.data_loader["dones"][start:end] if isinstance(self.data_loader["dones"], list) else self.data_loader["dones"][start:end],
+                "next_obs": {
+                    "stock_obs": self.data_loader["next_obs"]["stock_obs"][start:end],
+                    "additional_info": self.data_loader["next_obs"]["additional_info"][start:end]
                 }
-                is_valid, msg = self.check_batch_size(batch)
-                if not is_valid:
-                    raise ValueError(msg)
-                yield batch
+            }
+            is_valid, msg = self.check_batch_size(batch)
+            if not is_valid:
+                raise ValueError(msg)
+            yield batch
 
     def check_batch_size(self, batch):
             # Get batch size from "obs"

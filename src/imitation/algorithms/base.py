@@ -13,6 +13,7 @@ from typing import (
     cast,
 )
 
+import numpy as np
 import torch.utils.data as th_data
 from stable_baselines3.common import policies
 

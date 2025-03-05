@@ -593,6 +593,15 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 if isinstance(d[k], th.Tensor):
                     d[k] = d[k].detach().numpy()
 
+        # In _make_disc_train_batches, before the loop over fields
+        for field in expert_samples:
+            if isinstance(expert_samples[field], list):
+                expert_samples[field] = np.array(expert_samples[field])
+            elif isinstance(expert_samples[field], dict):
+                for sub_key in expert_samples[field]:
+                    if isinstance(expert_samples[field][sub_key], list):
+                        expert_samples[field][sub_key] = np.array(expert_samples[field][sub_key])
+
         if isinstance(gen_samples["obs"], dict):
             for sub_key in gen_samples["obs"]:
                 assert isinstance(gen_samples["obs"][sub_key], np.ndarray)

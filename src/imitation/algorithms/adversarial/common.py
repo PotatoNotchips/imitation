@@ -481,6 +481,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         self,
         obs_th: th.Tensor,
         acts_th: th.Tensor,
+        lstm_states: RNNStates,
+        episode_starts: th.Tensor,
     ) -> Optional[th.Tensor]:
         """Evaluates the given actions on the given observations.
 

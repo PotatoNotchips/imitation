@@ -616,6 +616,22 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         else:
             assert isinstance(expert_samples["next_obs"], np.ndarray)
 
+        # NEW: Randomly slice expert_samples to match batch_size if necessary
+        if len(expert_samples["acts"]) > batch_size:
+            # Select random indices based on the length of "acts"
+            indices = np.random.choice(len(expert_samples["acts"]), batch_size, replace=False)
+            
+            # Apply slicing to all fields consistently
+            for field in list(expert_samples.keys()):
+                if field in expert_samples:
+                    if isinstance(expert_samples[field], dict):
+                        # Handle dictionary fields like "obs" and "next_obs"
+                        for sub_key in expert_samples[field]:
+                            expert_samples[field][sub_key] = expert_samples[field][sub_key][indices]
+                    else:
+                        # Handle array/list fields like "acts"
+                        expert_samples[field] = expert_samples[field][indices]
+        
         print("Batch Size: ", batch_size)
         print("Expert Samples Obs Stock Obs len: ", len(expert_samples["obs"]["stock_obs"]))
         print("Expert Samples Obs Additional info len: ", len(expert_samples["obs"]["additional_info"]))

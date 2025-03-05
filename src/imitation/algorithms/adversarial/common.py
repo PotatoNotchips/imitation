@@ -697,7 +697,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
 
             # Calculate generator-policy log probabilities.
             with th.no_grad():
-                obs_th = th.as_tensor(obs, device=self.gen_algo.device)
+                #obs_th = th.as_tensor(obs, device=self.gen_algo.device)
+                obs_th = {key: th.as_tensor(value, device=self.gen_algo.device) for key, value in obs.items()}
                 acts_th = th.as_tensor(acts, device=self.gen_algo.device)
                 log_policy_act_prob = self._get_log_policy_act_prob(obs_th, acts_th)
                 if log_policy_act_prob is not None:

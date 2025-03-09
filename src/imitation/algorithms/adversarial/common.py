@@ -501,6 +501,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             _, log_policy_act_prob_th, _ = self.policy.evaluate_actions(
                 obs_th,
                 acts_th,
+                lstm_states,
+                episode_starts,
             )
         elif isinstance(self.policy, sac_policies.SACPolicy):
             gen_algo_actor = self.policy.actor

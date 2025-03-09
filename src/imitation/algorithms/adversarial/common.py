@@ -690,6 +690,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 next_obs = np.concatenate([expert_batch["next_obs"], gen_batch["next_obs"]])
             acts = np.concatenate([expert_batch["acts"], gen_batch["acts"]])
             dones = np.concatenate([expert_batch["dones"], gen_batch["dones"]])
+            lstm_states = expert_batch["lstm_states"]
+            episodes_start = expert_batch["episodes_start"]
             # notice that the labels use the convention that expert samples are
             # labelled with 1 and generator samples with 0.
             labels_expert_is_one = np.concatenate(
@@ -704,7 +706,11 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 #obs_th = th.as_tensor(obs, device=self.gen_algo.device)
                 obs_th = {key: th.as_tensor(value, device=self.gen_algo.device) for key, value in obs.items()}
                 acts_th = th.as_tensor(acts, device=self.gen_algo.device)
-                log_policy_act_prob = self._get_log_policy_act_prob(obs_th, acts_th)
+                log_policy_act_prob = self._get_log_policy_act_prob(
+                    obs_th=obs_th, 
+                    acts_th=acts_th, 
+                    lstm_states=lstm_states, 
+                    episode_starts=episodes_starts,)
                 if log_policy_act_prob is not None:
                     assert len(log_policy_act_prob) == 2 * self.demo_minibatch_size
                     log_policy_act_prob = log_policy_act_prob.reshape(

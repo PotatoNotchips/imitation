@@ -647,17 +647,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         # Handle array/list fields like "acts"
                         expert_samples[field] = expert_samples[field][indices]
         
-        print("Batch Size: ", batch_size)
-        print("Expert Samples Obs Stock Obs len: ", len(expert_samples["obs"]["stock_obs"]))
-        print("Expert Samples Obs Additional info len: ", len(expert_samples["obs"]["additional_info"]))
-        print("Gen Samples Obs Stock Obs len: ", len(gen_samples["obs"]["stock_obs"]))
-        print("Gen Samples Obs Additional Info len: ", len(gen_samples["obs"]["additional_info"]))
-        print("Expert Samples Next Obs Stock Obs len: ", len(expert_samples["next_obs"]["stock_obs"]))
-        print("Expert Samples Next Obs Additional Info len: ", len(expert_samples["next_obs"]["additional_info"]))
-        print("Gen Samples Next Obs Stock Obs len: ", len(gen_samples["next_obs"]["stock_obs"]))
-        print("Gen Samples Next Obs Additional Info len: ", len(gen_samples["next_obs"]["additional_info"]))
-        print("Expert Samples Acts len: ", len(expert_samples["acts"]))
-        print("Gen Samples Acts len: ", len(gen_samples["acts"]))
         assert batch_size == len(expert_samples["acts"])
         assert batch_size == len(gen_samples["acts"])
         assert batch_size == len(expert_samples["obs"]["stock_obs"])

@@ -8,6 +8,7 @@ from stable_baselines3.sac import policies as sac_policies
 from imitation.algorithms import base
 from imitation.algorithms.adversarial import common
 from imitation.rewards import reward_nets
+from sb3_contrib.common.recurrent.type_aliases import RNNStates
 
 STOCHASTIC_POLICIES = (sac_policies.SACPolicy, policies.ActorCriticPolicy)
 

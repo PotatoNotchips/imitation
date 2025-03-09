@@ -23,6 +23,8 @@ from imitation.data import buffer, rollout, types, wrappers
 from imitation.rewards import reward_nets, reward_wrapper
 from imitation.util import logger, networks, util
 
+from sb3_contrib.common.recurrent.type_aliases import RNNStates
+
 
 def compute_train_stats(
     disc_logits_expert_is_high: th.Tensor,

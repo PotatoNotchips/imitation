@@ -719,7 +719,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             acts = np.concatenate([expert_batch["acts"], gen_batch["acts"]])
             dones = np.concatenate([expert_batch["dones"], gen_batch["dones"]])
             lstm_states = expert_batch["lstm_states"]
-            episode_starts = np.concatenate(expert_batch["episode_starts"], expert_batch["episode_starts"])
+            episode_starts = np.concatenate([expert_batch["episode_starts"], expert_batch["episode_starts"]])
             # notice that the labels use the convention that expert samples are
             # labelled with 1 and generator samples with 0.
             labels_expert_is_one = np.concatenate(

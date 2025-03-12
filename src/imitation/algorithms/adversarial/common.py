@@ -589,6 +589,40 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         # Guarantee that Mapping arguments are in mutable form.
         expert_samples = dict(expert_samples)
         gen_samples = dict(gen_samples)
+
+        # Inline expansion and printing
+        print("Expanding expert_samples:")
+        stack = [(expert_samples, "")]  # Stack for iterative traversal: (dict, prefix)
+        
+        while stack:
+            current_dict, prefix = stack.pop()
+            if not isinstance(current_dict, dict):
+                print(f"{prefix}Not a dictionary: {type(current_dict)}")
+                continue
+            
+            for key, value in current_dict.items():
+                key_str = str(key)
+                key_len = len(key_str)  # Length of the key as a string
+                
+                if isinstance(value, dict):
+                    print(f"{prefix}Key: '{key_str}' (len={key_len}) -> Nested dictionary:")
+                    stack.append((value, prefix + "  "))  # Add nested dict to stack
+                else:
+                    # Determine the size of the value
+                    if hasattr(value, 'shape'):  # PyTorch tensor or NumPy array
+                        value_size = value.shape
+                        size_type = "shape"
+                    elif hasattr(value, 'size') and callable(value.size):  # PyTorch tensor explicit check
+                        value_size = value.size()
+                        size_type = "shape"
+                    elif isinstance(value, (list, tuple)):  # Lists or tuples
+                        value_size = len(value)
+                        size_type = "len"
+                    else:  # Scalars or other types
+                        value_size = "N/A (scalar or unknown type)"
+                        size_type = "size"
+                    
+                    print(f"{prefix}Key: '{key_str}' (len={key_len}) -> Value {size_type}: {value_size}")
         
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):

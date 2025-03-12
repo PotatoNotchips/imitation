@@ -665,12 +665,23 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         else:
             assert isinstance(expert_samples["next_obs"], np.ndarray)
 
+        # Determine the minimum valid batch size across all fields and sub-keys
+        min_batch_size = batch_size  # Start with the default batch size
+        
+        # Check lengths of all fields in expert_samples
+        for field in list(expert_samples.keys()):
+            if isinstance(expert_samples[field], dict):  # Check sub-keys for dictionary fields (e.g., "obs", "next_obs")
+                for sub_key in expert_samples[field]:
+                    min_batch_size = min(min_batch_size, len(expert_samples[field][sub_key]))
+            else:  # For non-dictionary fields (e.g., "acts")
+                min_batch_size = min(min_batch_size, len(expert_samples[field]))
+        
         # NEW: Randomly slice expert_samples to match batch_size if necessary
         if len(expert_samples["acts"]) > batch_size:
             # Select random indices based on the length of "acts"
             print("This is the length of the acts:", len(expert_samples["acts"]))
             print("This is the batch_size:", batch_size)
-            indices = np.random.choice(len(expert_samples["acts"]), batch_size, replace=False)
+            indices = np.random.choice(min_batch_size, min_batch_size, replace=False)
             
             # Apply slicing to all fields consistently
             for field in list(expert_samples.keys()):

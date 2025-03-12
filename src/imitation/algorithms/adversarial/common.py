@@ -370,7 +370,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
 
                 # Renormalise the loss to be averaged over the whole
                 # batch size instead of the minibatch size.
-                assert len(batch["state"]) == 2 * self.demo_minibatch_size
+                assert len(batch["action"]) == 2 * self.demo_minibatch_size
                 loss *= self.demo_minibatch_size / self.demo_batch_size
                 loss.backward()
 

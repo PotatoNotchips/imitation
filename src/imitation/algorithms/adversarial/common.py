@@ -739,7 +739,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             print("state stock obs:", th.isnan(batch_dict["state"]["stock_obs"]).any(), th.isinf(batch_dict["state"]["stock_obs"]).any())
             print("state additional info:", th.isnan(batch_dict["state"]["additional_info"]).any(), th.isinf(batch_dict["state"]["additional_info"]).any())
             print("action:", th.isnan(batch_dict["action"]).any(), th.isinf(batch_dict["action"]).any())
-            print("next_state:", th.isnan(batch_dict["next_state"]).any(), th.isinf(batch_dict["next_state"]).any())
+            print("next_state stock obs:", th.isnan(batch_dict["next_state"]["stock_obs"]).any(), th.isinf(batch_dict["next_state"]["stock_obs"]).any())
+            print("next_state additional info:", th.isnan(batch_dict["next_state"]["additional_info"]).any(), th.isinf(batch_dict["next_state"]["additional_info"]).any())
             print("done:", th.isnan(batch_dict["done"]).any(), th.isinf(batch_dict["done"]).any())
             print("log_policy_act_prob:", th.isnan(log_policy_act_prob).any(), th.isinf(log_policy_act_prob).any())
 

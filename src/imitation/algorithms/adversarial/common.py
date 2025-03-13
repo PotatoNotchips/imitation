@@ -736,7 +736,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             }
             
             print("Checking inputs to logits_expert_is_high:")
-            print("state:", th.isnan(batch_dict["state"]).any(), th.isinf(batch_dict["state"]).any())
+            print("state stock obs:", th.isnan(batch_dict["state"]["stock_obs"]).any(), th.isinf(batch_dict["state"]["stock_obs"]).any())
+            print("state additional info:", th.isnan(batch_dict["state"]["additional_info"]).any(), th.isinf(batch_dict["state"]["additional_info"]).any())
             print("action:", th.isnan(batch_dict["action"]).any(), th.isinf(batch_dict["action"]).any())
             print("next_state:", th.isnan(batch_dict["next_state"]).any(), th.isinf(batch_dict["next_state"]).any())
             print("done:", th.isnan(batch_dict["done"]).any(), th.isinf(batch_dict["done"]).any())

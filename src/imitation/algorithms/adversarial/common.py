@@ -734,5 +734,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 "labels_expert_is_one": self._torchify_array(labels_expert_is_one),
                 "log_policy_act_prob": log_policy_act_prob,
             }
+            
+            print("Checking inputs to logits_expert_is_high:")
+            print("state:", th.isnan(batch_dict["state"]).any(), th.isinf(batch_dict["state"]).any())
+            print("action:", th.isnan(batch_dict["action"]).any(), th.isinf(batch_dict["action"]).any())
+            print("next_state:", th.isnan(batch_dict["next_state"]).any(), th.isinf(batch_dict["next_state"]).any())
+            print("done:", th.isnan(batch_dict["done"]).any(), th.isinf(batch_dict["done"]).any())
+            print("log_policy_act_prob:", th.isnan(log_policy_act_prob).any(), th.isinf(log_policy_act_prob).any())
 
             yield batch_dict

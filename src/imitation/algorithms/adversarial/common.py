@@ -231,7 +231,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             self._summary_writer = thboard.SummaryWriter(str(summary_dir))
 
         self.venv_buffering = wrappers.BufferingWrapper(self.venv)
+        self.device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
 
+        # Move the reward network to the device
+        self.reward_train = reward_net
+        self.reward_train.to(self.device)
+        
         if debug_use_ground_truth:
             # Would use an identity reward fn here, but RewardFns can't see rewards.
             self.venv_wrapped = self.venv_buffering

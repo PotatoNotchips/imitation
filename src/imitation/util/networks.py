@@ -63,8 +63,9 @@ class BaseNorm(nn.Module, abc.ABC):
             eps: Small constant for numerical stability. Inputs are rescaled by
                 `1 / sqrt(estimated_variance + eps)`.
         """
+        device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
         super().__init__()
-        self.eps = eps
+        self.eps = eps.to(device)
         self.register_buffer("running_mean", th.empty(num_features))
         self.register_buffer("running_var", th.empty(num_features))
         self.register_buffer("count", th.empty((), dtype=th.int))
@@ -78,6 +79,7 @@ class BaseNorm(nn.Module, abc.ABC):
 
     def forward(self, x: th.Tensor) -> th.Tensor:
         """Updates statistics if in training mode. Returns normalized `x`."""
+        device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
         if self.training:
             # Do not backpropagate through updating running mean and variance.
             # These updates are in-place and not differentiable. The gradient
@@ -88,6 +90,7 @@ class BaseNorm(nn.Module, abc.ABC):
 
         # Note: this is different from the behavior in stable-baselines, see
         # https://github.com/HumanCompatibleAI/imitation/issues/442
+        x = x.to(device)
         return (x - self.running_mean) / th.sqrt(self.running_var + self.eps)
 
     @abc.abstractmethod

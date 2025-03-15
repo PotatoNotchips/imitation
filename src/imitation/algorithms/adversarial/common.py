@@ -723,27 +723,79 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 for k, v in gen_samples.items()
             }
 
-            # Concatenate rollouts, and label each row as expert or generator.
-            if isinstance(expert_batch["obs"], dict):
-                obs = {k: np.concatenate([expert_batch["obs"][k], gen_batch["obs"][k]]) for k in expert_batch["obs"]}
+            if self.device != 'cpu':
+                for field in gen_batch:
+                    if isinstance(gen_batch[field], dict):
+                        # Handle dictionary fields like "obs" and "next_obs"
+                        for sub_key in gen_batch[field]:
+                            value = gen_batch[field][sub_key]
+                            if isinstance(value, th.Tensor):
+                                gen_batch[field][sub_key] = value.to(device)
+                            elif isinstance(value, np.ndarray):
+                                gen_batch[field][sub_key] = th.tensor(value, device=device)
+                            elif isinstance(value, list):
+                                gen_batch[field][sub_key] = th.tensor(np.array(value), device=device)
+                            else:
+                                raise TypeError(f"Unsupported type in gen_batch[{field}][{sub_key}]: {type(value)}")
+                    else:
+                        # Handle flat fields like "acts", "dones", etc.
+                        value = gen_batch[field]
+                        if isinstance(value, th.Tensor):
+                            gen_batch[field] = value.to(device)
+                        elif isinstance(value, np.ndarray):
+                            gen_batch[field] = th.tensor(value, device=device)
+                        elif isinstance(value, list):
+                            gen_batch[field] = th.tensor(np.array(value), device=device)
+                        else:
+                            raise TypeError(f"Unsupported type in gen_batch[{field}]: {type(value)}")
+
+            if self.device == 'cpu':
+                # Concatenate rollouts, and label each row as expert or generator.
+                if isinstance(expert_batch["obs"], dict):
+                    obs = {k: np.concatenate([expert_batch["obs"][k], gen_batch["obs"][k]]) for k in expert_batch["obs"]}
+                else:
+                    obs = np.concatenate([expert_batch["obs"], gen_batch["obs"]])
+                if isinstance(expert_batch["next_obs"], dict):
+                    next_obs = {k: np.concatenate([expert_batch["next_obs"][k], gen_batch["next_obs"][k]]) for k in expert_batch["next_obs"]}
+                else:
+                    next_obs = np.concatenate([expert_batch["next_obs"], gen_batch["next_obs"]])
+                acts = np.concatenate([expert_batch["acts"], gen_batch["acts"]])
+                dones = np.concatenate([expert_batch["dones"], gen_batch["dones"]])
+                lstm_states = expert_batch["lstm_states"]
+                episode_starts = np.concatenate([expert_batch["episode_starts"], expert_batch["episode_starts"]])
+                # notice that the labels use the convention that expert samples are
+                # labelled with 1 and generator samples with 0.
+                labels_expert_is_one = np.concatenate(
+                    [
+                        np.ones(self.demo_minibatch_size, dtype=int),
+                        np.zeros(self.demo_minibatch_size, dtype=int),
+                    ],
+                )
             else:
-                obs = np.concatenate([expert_batch["obs"], gen_batch["obs"]])
-            if isinstance(expert_batch["next_obs"], dict):
-                next_obs = {k: np.concatenate([expert_batch["next_obs"][k], gen_batch["next_obs"][k]]) for k in expert_batch["next_obs"]}
-            else:
-                next_obs = np.concatenate([expert_batch["next_obs"], gen_batch["next_obs"]])
-            acts = np.concatenate([expert_batch["acts"], gen_batch["acts"]])
-            dones = np.concatenate([expert_batch["dones"], gen_batch["dones"]])
-            lstm_states = expert_batch["lstm_states"]
-            episode_starts = np.concatenate([expert_batch["episode_starts"], expert_batch["episode_starts"]])
-            # notice that the labels use the convention that expert samples are
-            # labelled with 1 and generator samples with 0.
-            labels_expert_is_one = np.concatenate(
-                [
-                    np.ones(self.demo_minibatch_size, dtype=int),
-                    np.zeros(self.demo_minibatch_size, dtype=int),
-                ],
-            )
+                # Concatenate rollouts
+                if isinstance(expert_batch["obs"], dict):
+                    obs = {k: th.cat([expert_batch["obs"][k], gen_batch["obs"][k]], dim=0) for k in expert_batch["obs"]}
+                else:
+                    obs = th.cat([expert_batch["obs"], gen_batch["obs"]], dim=0)
+                
+                if isinstance(expert_batch["next_obs"], dict):
+                    next_obs = {k: th.cat([expert_batch["next_obs"][k], gen_batch["next_obs"][k]], dim=0) for k in expert_batch["next_obs"]}
+                else:
+                    next_obs = th.cat([expert_batch["next_obs"], gen_batch["next_obs"]], dim=0)
+                
+                acts = th.cat([expert_batch["acts"], gen_batch["acts"]], dim=0)
+                dones = th.cat([expert_batch["dones"], gen_batch["dones"]], dim=0)
+                lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed
+                episode_starts = th.cat([expert_batch["episode_starts"], gen_batch["episode_starts"]], dim=0)
+                
+                # Create labels as tensors on the same device
+                labels_expert_is_one = th.cat(
+                    [
+                        th.ones(demo_minibatch_size, dtype=th.int, device=device),
+                        th.zeros(demo_minibatch_size, dtype=th.int, device=device),
+                    ],
+                    dim=0,
+                )
 
             # Calculate generator-policy log probabilities.
             with th.no_grad():

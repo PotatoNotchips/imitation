@@ -173,11 +173,10 @@ class RewardNet(nn.Module, abc.ABC):
                 done,
             )
             with th.no_grad():
-                state_th = {key: th.as_tensor(value, device=device) for key, value in state_th.items()}
-                action_th = action_th.to(device)
-                next_state_th = {key: th.as_tensor(value, device=device) for key, value in next_state_th.items()}
-                dones_th = dones_th.to(device)
-                rew_th = self(state_th, action_th, next_state_th, done_th)
+                rew_th = self({key: th.as_tensor(value, device=device) for key, value in state_th.items()}, 
+                              action_th.to(device), 
+                              {key: th.as_tensor(value, device=device) for key, value in next_state_th.items()}, 
+                              done_th.to(device))
 
         if isinstance(state, dict):
             # Use the shape of the first tensor in the state dictionary

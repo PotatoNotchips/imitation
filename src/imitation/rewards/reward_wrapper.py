@@ -74,9 +74,6 @@ class RewardVecEnvWrapper(vec_env.VecEnvWrapper):
         self._old_obs = None
         self._actions = None
         self.reset()
-
-        device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
-        self.reward_fn.to(device)
         
     def make_log_callback(self) -> WrappedRewardCallback:
         """Creates `WrappedRewardCallback` connected to this `RewardVecEnvWrapper`."""

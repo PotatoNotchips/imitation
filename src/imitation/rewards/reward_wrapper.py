@@ -4,6 +4,7 @@ import collections
 from typing import Deque
 
 import numpy as np
+import torch as th
 from stable_baselines3.common import callbacks
 from stable_baselines3.common import logger as sb_logger
 from stable_baselines3.common import vec_env

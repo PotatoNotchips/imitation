@@ -632,28 +632,27 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             # Convert it back to a PyTorch tensor on the GPU
                             expert_samples[field][sub_key] = th.tensor(expert_samples[field][sub_key], device="cuda:0")
 
-        if isinstance(gen_samples["obs"], dict):
-            for sub_key in gen_samples["obs"]:
-                assert isinstance(gen_samples["obs"][sub_key], np.ndarray)
-        else:
-            assert isinstance(gen_samples["obs"], np.ndarray)           
-        if isinstance(expert_samples["obs"], dict):
-            for sub_key in expert_samples["obs"]:
-                assert isinstance(expert_samples["obs"][sub_key], np.ndarray)            
-        else:
-            assert isinstance(expert_samples["obs"], np.ndarray)
-
-        # Check dimensions.
-        if isinstance(gen_samples["next_obs"], dict):
-            for sub_key in gen_samples["next_obs"]:
-                assert isinstance(gen_samples["next_obs"][sub_key], np.ndarray), f"gen_samples['next_obs']['{sub_key}'] must be a numpy array"
-        else:
-            assert isinstance(gen_samples["next_obs"], np.ndarray)
-        if isinstance(expert_samples["next_obs"], dict):
-            for sub_key in expert_samples["next_obs"]:
-                assert isinstance(expert_samples["next_obs"][sub_key], np.ndarray), f"expert_samples['next_obs']['{sub_key}'] must be a numpy array"
-        else:
-            assert isinstance(expert_samples["next_obs"], np.ndarray)
+        if self.device == 'cpu':
+            if isinstance(gen_samples["obs"], dict):
+                for sub_key in gen_samples["obs"]:
+                    assert isinstance(gen_samples["obs"][sub_key], np.ndarray)
+            else:
+                assert isinstance(gen_samples["obs"], np.ndarray)           
+            if isinstance(expert_samples["obs"], dict):
+                for sub_key in expert_samples["obs"]:
+                    assert isinstance(expert_samples["obs"][sub_key], np.ndarray)            
+            else:
+                assert isinstance(expert_samples["obs"], np.ndarray)
+            if isinstance(gen_samples["next_obs"], dict):
+                for sub_key in gen_samples["next_obs"]:
+                    assert isinstance(gen_samples["next_obs"][sub_key], np.ndarray), f"gen_samples['next_obs']['{sub_key}'] must be a numpy array"
+            else:
+                assert isinstance(gen_samples["next_obs"], np.ndarray)
+            if isinstance(expert_samples["next_obs"], dict):
+                for sub_key in expert_samples["next_obs"]:
+                    assert isinstance(expert_samples["next_obs"][sub_key], np.ndarray), f"expert_samples['next_obs']['{sub_key}'] must be a numpy array"
+            else:
+                assert isinstance(expert_samples["next_obs"], np.ndarray)
 
         # Determine the minimum valid batch size across all fields and sub-keys
         min_batch_size = batch_size  # Start with the default batch size

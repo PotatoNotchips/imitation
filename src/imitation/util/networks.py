@@ -63,9 +63,7 @@ class BaseNorm(nn.Module, abc.ABC):
             eps: Small constant for numerical stability. Inputs are rescaled by
                 `1 / sqrt(estimated_variance + eps)`.
         """
-        device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
         super().__init__()
-        self.eps = eps.to(device)
         self.register_buffer("running_mean", th.empty(num_features))
         self.register_buffer("running_var", th.empty(num_features))
         self.register_buffer("count", th.empty((), dtype=th.int))

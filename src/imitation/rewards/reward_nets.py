@@ -173,9 +173,9 @@ class RewardNet(nn.Module, abc.ABC):
                 done,
             )
             with th.no_grad():
-                state_th = state_th.to(device)
+                state_th = {key: th.as_tensor(value, device=device) for key, value in state_th.items()}
                 action_th = action_th.to(device)
-                next_state_th = next_state_th.to(device)
+                next_state_th = {key: th.as_tensor(value, device=device) for key, value in next_state_th.items()}
                 dones_th = dones_th.to(device)
                 rew_th = self(state_th, action_th, next_state_th, done_th)
 

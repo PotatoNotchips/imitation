@@ -161,6 +161,8 @@ class RewardNet(nn.Module, abc.ABC):
         Returns:
             Computed th.Tensor rewards of shape `(batch_size,`).
         """
+        device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
+        
         with networks.evaluating(self):
             # switch to eval mode (affecting normalization, dropout, etc)
 
@@ -171,6 +173,10 @@ class RewardNet(nn.Module, abc.ABC):
                 done,
             )
             with th.no_grad():
+                state_th = state_th.to(device)
+                action_th = action_th.to(device)
+                next_state_th = next_state_th.to(device)
+                dones_th = dones_th.to(device)
                 rew_th = self(state_th, action_th, next_state_th, done_th)
 
         if isinstance(state, dict):
@@ -470,6 +476,7 @@ class BasicRewardNet(RewardNet):
         self.mlp = networks.build_mlp(**full_build_mlp_kwargs)
 
     def forward(self, state, action, next_state, done):
+        device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
         inputs = []
         if self.use_state:
             if isinstance(state, dict):
@@ -493,9 +500,9 @@ class BasicRewardNet(RewardNet):
         if self.use_done:
             inputs.append(th.reshape(done, [-1, 1]))
 
-        inputs_concat = th.cat(inputs, dim=1)
+        inputs_concat = th.cat(inputs, dim=1).to(device)
 
-        outputs = self.mlp(inputs_concat)
+        outputs = self.mlp(inputs_concat).to(device)
         
         assert outputs.shape == expected_shape
 

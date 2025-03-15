@@ -664,32 +664,52 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     min_batch_size = min(min_batch_size, len(expert_samples[field][sub_key]))
             else:  # For non-dictionary fields (e.g., "acts")
                 min_batch_size = min(min_batch_size, len(expert_samples[field]))
-        
-        # NEW: Randomly slice expert_samples to match batch_size if necessary
-        if len(expert_samples["acts"]) > batch_size:
-            indices = np.random.choice(min_batch_size, min_batch_size, replace=False)
-            
-            # Apply slicing to all fields consistently
-            for field in list(expert_samples.keys()):
-                if field in expert_samples:
-                    if isinstance(expert_samples[field], dict):
-                        # Handle dictionary fields like "obs" and "next_obs"
-                        for sub_key in expert_samples[field]:
-                            expert_samples[field][sub_key] = expert_samples[field][sub_key][indices]
-                    else:
-                        # Handle array/list fields like "acts"
-                        expert_samples[field] = expert_samples[field][indices]
-        
-        assert batch_size == len(expert_samples["acts"])
-        assert batch_size == len(gen_samples["acts"])
-        assert batch_size == len(expert_samples["obs"]["stock_obs"])
-        assert batch_size == len(expert_samples["obs"]["additional_info"])
-        assert batch_size == len(gen_samples["obs"]["stock_obs"])
-        assert batch_size == len(gen_samples["obs"]["additional_info"])
-        assert batch_size == len(expert_samples["next_obs"]["stock_obs"])
-        assert batch_size == len(expert_samples["next_obs"]["additional_info"])
-        assert batch_size == len(gen_samples["next_obs"]["stock_obs"])
-        assert batch_size == len(gen_samples["next_obs"]["additional_info"])
+
+        if self.device == 'cpu':
+            # NEW: Randomly slice expert_samples to match batch_size if necessary
+            if len(expert_samples["acts"]) > batch_size:
+                indices = np.random.choice(min_batch_size, min_batch_size, replace=False)
+                
+                # Apply slicing to all fields consistently
+                for field in list(expert_samples.keys()):
+                    if field in expert_samples:
+                        if isinstance(expert_samples[field], dict):
+                            # Handle dictionary fields like "obs" and "next_obs"
+                            for sub_key in expert_samples[field]:
+                                expert_samples[field][sub_key] = expert_samples[field][sub_key][indices]
+                        else:
+                            # Handle array/list fields like "acts"
+                            expert_samples[field] = expert_samples[field][indices]
+        else:
+            if expert_samples["acts"].shape[0] > batch_size:
+                # Determine the device dynamically (e.g., same as expert_samples["acts"])
+                device = expert_samples["acts"].device
+                
+                # Generate random indices as a PyTorch tensor on the same device
+                indices = th.randperm(expert_samples["acts"].shape[0], device=device)[:batch_size]
+                
+                # Apply slicing to all fields consistently
+                for field in list(expert_samples.keys()):
+                    if field in expert_samples:
+                        if isinstance(expert_samples[field], dict):
+                            # Handle dictionary fields like "obs" and "next_obs"
+                            for sub_key in expert_samples[field]:
+                                expert_samples[field][sub_key] = expert_samples[field][sub_key][indices]
+                        else:
+                            # Handle tensor fields like "acts"
+                            expert_samples[field] = expert_samples[field][indices]
+
+        if self.device == 'cpu':
+            assert batch_size == len(expert_samples["acts"])
+            assert batch_size == len(gen_samples["acts"])
+            assert batch_size == len(expert_samples["obs"]["stock_obs"])
+            assert batch_size == len(expert_samples["obs"]["additional_info"])
+            assert batch_size == len(gen_samples["obs"]["stock_obs"])
+            assert batch_size == len(gen_samples["obs"]["additional_info"])
+            assert batch_size == len(expert_samples["next_obs"]["stock_obs"])
+            assert batch_size == len(expert_samples["next_obs"]["additional_info"])
+            assert batch_size == len(gen_samples["next_obs"]["stock_obs"])
+            assert batch_size == len(gen_samples["next_obs"]["additional_info"])
 
         for start in range(0, batch_size, self.demo_minibatch_size):
             end = start + self.demo_minibatch_size

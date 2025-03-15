@@ -64,6 +64,7 @@ class BaseNorm(nn.Module, abc.ABC):
                 `1 / sqrt(estimated_variance + eps)`.
         """
         super().__init__()
+        self.eps = eps
         self.register_buffer("running_mean", th.empty(num_features))
         self.register_buffer("running_var", th.empty(num_features))
         self.register_buffer("count", th.empty((), dtype=th.int))

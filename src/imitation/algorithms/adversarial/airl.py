@@ -64,7 +64,10 @@ class AIRL(common.AdversarialTrainer):
             raise TypeError(
                 "AIRL needs a stochastic policy to compute the discriminator output.",
             )
+            
+        self.device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
 
+    
     def logits_expert_is_high(
         self,
         state: th.Tensor,

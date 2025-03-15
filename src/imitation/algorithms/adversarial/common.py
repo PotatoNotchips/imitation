@@ -605,23 +605,22 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     d[k] = d[k].detach().numpy()
 
         # In _make_disc_train_batches, before the loop over fields
-        for field in expert_samples:
-            if isinstance(expert_samples[field], list):
-                expert_samples[field] = np.array(expert_samples[field])
-            elif isinstance(expert_samples[field], th.Tensor):  # Handle GPU tensors
-                # Move to CPU, convert to NumPy, and back to GPU
-                np_array = expert_samples[field].cpu().numpy()
-                # (Optional: Perform operations on np_array if needed)
-                expert_samples[field] = th.tensor(np_array, device="cuda:0")
-            elif isinstance(expert_samples[field], dict):  # Handle nested dicts
-                for sub_key in expert_samples[field]:
-                    if isinstance(expert_samples[field][sub_key], th.Tensor):
-                        # Move to CPU, convert to NumPy, and back to GPU
-                        np_array = expert_samples[field][sub_key].cpu().numpy()
-                        # (Optional: Perform operations on np_array if needed)
-                        expert_samples[field][sub_key] = th.tensor(np_array, device="cuda:0")
-                    else:
-                        expert_samples[field][sub_key] = np.array(expert_samples[field][sub_key])
+        if self.device == 'cpu':
+            for field in expert_samples:
+                if isinstance(expert_samples[field], list):
+                    expert_samples[field] = np.array(expert_samples[field])
+                elif isinstance(expert_samples[field], dict):  # Handle nested dicts
+                    for sub_key in expert_samples[field]:
+                            expert_samples[field][sub_key] = np.array(expert_samples[field][sub_key])
+        else:
+            for field in expert_samples:
+                if isinstance(expert_samples[field], list):
+                    np_array = expert_samples[field].cpu().numpy()
+                    expert_samples[field] = np.array(expert_samples[field])
+                elif isinstance(expert_samples[field], dict):  # Handle nested dicts
+                    for sub_key in expert_samples[field]:
+                            np_array = expert_samples[field][sub_key].cpu().numpy()
+                            expert_samples[field][sub_key] = th.tensor(np_array, device="cuda:0")
 
         if isinstance(gen_samples["obs"], dict):
             for sub_key in gen_samples["obs"]:

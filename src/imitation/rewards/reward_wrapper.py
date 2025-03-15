@@ -12,8 +12,6 @@ from stable_baselines3.common import vec_env
 from imitation.data import types
 from imitation.rewards import reward_function
 
-self.device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
-
 
 class WrappedRewardCallback(callbacks.BaseCallback):
     """Logs mean wrapped reward as part of RL (or other) training."""
@@ -73,11 +71,13 @@ class RewardVecEnvWrapper(vec_env.VecEnvWrapper):
         # self._cumulative_rew = np.zeros((venv.num_envs,))
         self._cumulative_rew = np.zeros((1,))
         self.reward_fn = reward_fn
-        self.reward_fn.to(self.device)
         self._old_obs = None
         self._actions = None
         self.reset()
 
+        device = th.device('cuda:0' if th.cuda.is_available() else 'cpu')
+        self.reward_fn.to(device)
+        
     def make_log_callback(self) -> WrappedRewardCallback:
         """Creates `WrappedRewardCallback` connected to this `RewardVecEnvWrapper`."""
         return WrappedRewardCallback(self.episode_rewards)

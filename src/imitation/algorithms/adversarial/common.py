@@ -708,6 +708,11 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             elif isinstance(expert_samples[field], list):
                                 expert_samples[field] = [item[indices] for item in expert_samples[field]]
                             else:
+                                print("Currently in the else part!")
+                                print("This is the type of expert samples field:", type(expert_samples[field]))
+                                print("This is the type of expert samples field inside:", type(expert_samples[field][0]))
+                                print("Now try to tensorize the inside first!")
+                                expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
                                 expert_samples[field] = expert_samples[field][indices]
 
         if self.device == 'cpu':

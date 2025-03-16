@@ -682,8 +682,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             expert_samples[field] = expert_samples[field][indices]
         else:
             if expert_samples["acts"].shape[0] > batch_size:
-                # Determine the device dynamically (e.g., same as expert_samples["acts"])
-                device = expert_samples["acts"].device
                 
                 # Generate random indices as a PyTorch tensor on the same device
                 indices = th.randperm(expert_samples["acts"].shape[0], device=device)[:batch_size]

@@ -692,7 +692,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             if expert_samples["acts"].shape[0] > batch_size:
                 
                 # Generate random indices as a PyTorch tensor on the same device
-                indices = th.randperm(expert_samples["acts"].shape[0], device=device)[:batch_size]
+                indices = th.randperm(expert_samples["acts"].shape[0], device='cuda:0')[:batch_size]
                 
                 # Apply slicing to all fields consistently
                 for field in list(expert_samples.keys()):

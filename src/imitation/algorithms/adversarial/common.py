@@ -767,9 +767,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                         gen_batch[field][sub_key] = sub_value.to(self.device)
                                     elif isinstance(sub_value, np.ndarray):
                                         if sub_value.dtype == np.object_:
-                                            # Convert object array elements to tensors, keeping as a list
+                                            # Convert object array elements, handling nested dictionaries
                                             gen_batch[field][sub_key] = [
-                                                th.tensor(item, device=self.device) if isinstance(item, np.ndarray) else item.to(self.device)
+                                                {k: th.tensor(v, device=self.device) if isinstance(v, np.ndarray) else v.to(self.device) for k, v in item.items()} 
+                                                if isinstance(item, dict)
+                                                else th.tensor(item, device=self.device) if isinstance(item, np.ndarray) 
+                                                else item.to(self.device) 
                                                 for item in sub_value
                                             ]
                                         else:
@@ -785,9 +788,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 gen_batch[field] = value.to(self.device)
                             elif isinstance(value, np.ndarray):
                                 if value.dtype == np.object_:
-                                    # Convert object array elements to tensors, keeping as a list
+                                    # Convert object array elements, handling nested dictionaries
                                     gen_batch[field] = [
-                                        th.tensor(item, device=self.device) if isinstance(item, np.ndarray) else item.to(self.device)
+                                        {k: th.tensor(v, device=self.device) if isinstance(v, np.ndarray) else v.to(self.device) for k, v in item.items()} 
+                                        if isinstance(item, dict)
+                                        else th.tensor(item, device=self.device) if isinstance(item, np.ndarray) 
+                                        else item.to(self.device) 
                                         for item in value
                                     ]
                                 else:

@@ -748,22 +748,22 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         for sub_key in gen_batch[field]:
                             value = gen_batch[field][sub_key]
                             if isinstance(value, th.Tensor):
-                                gen_batch[field][sub_key] = value.to(device)
+                                gen_batch[field][sub_key] = value.to(self.device)
                             elif isinstance(value, np.ndarray):
-                                gen_batch[field][sub_key] = th.tensor(value, device=device)
+                                gen_batch[field][sub_key] = th.tensor(value, device=self.device)
                             elif isinstance(value, list):
-                                gen_batch[field][sub_key] = th.tensor(np.array(value), device=device)
+                                gen_batch[field][sub_key] = th.tensor(np.array(value), device=self.device)
                             else:
                                 raise TypeError(f"Unsupported type in gen_batch[{field}][{sub_key}]: {type(value)}")
                     else:
                         # Handle flat fields like "acts", "dones", etc.
                         value = gen_batch[field]
                         if isinstance(value, th.Tensor):
-                            gen_batch[field] = value.to(device)
+                            gen_batch[field] = value.to(self.device)
                         elif isinstance(value, np.ndarray):
-                            gen_batch[field] = th.tensor(value, device=device)
+                            gen_batch[field] = th.tensor(value, device=self.device)
                         elif isinstance(value, list):
-                            gen_batch[field] = th.tensor(np.array(value), device=device)
+                            gen_batch[field] = th.tensor(np.array(value), device=self.device)
                         else:
                             raise TypeError(f"Unsupported type in gen_batch[{field}]: {type(value)}")
 
@@ -809,8 +809,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 # Create labels as tensors on the same device
                 labels_expert_is_one = th.cat(
                     [
-                        th.ones(demo_minibatch_size, dtype=th.int, device=device),
-                        th.zeros(demo_minibatch_size, dtype=th.int, device=device),
+                        th.ones(demo_minibatch_size, dtype=th.int, device=self.device),
+                        th.zeros(demo_minibatch_size, dtype=th.int, device=self.device),
                     ],
                     dim=0,
                 )

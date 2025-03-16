@@ -689,21 +689,26 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             # Handle array/list fields like "acts"
                             expert_samples[field] = expert_samples[field][indices]
         else:
-            if expert_samples["acts"].shape[0] > batch_size:
+                if isinstance(expert_samples["acts"], list):
+                    total_size = expert_samples["acts"][0].shape[0]  # Use shape[0] of first tensor in list
+                else:
+                    total_size = expert_samples["acts"].shape[0]
                 
-                # Generate random indices as a PyTorch tensor on the same device
-                indices = th.randperm(expert_samples["acts"].shape[0], device='cuda:0')[:batch_size]
-                
-                # Apply slicing to all fields consistently
-                for field in list(expert_samples.keys()):
-                    if field in expert_samples:
-                        if isinstance(expert_samples[field], dict):
-                            # Handle dictionary fields like "obs" and "next_obs"
-                            for sub_key in expert_samples[field]:
-                                expert_samples[field][sub_key] = expert_samples[field][sub_key][indices]
-                        else:
-                            # Handle tensor fields like "acts"
-                            expert_samples[field] = expert_samples[field][indices]
+                if total_size > batch_size:
+                    indices = th.randperm(total_size, device=self.device)[:batch_size]
+                    for field in list(expert_samples.keys()):
+                        if field in expert_samples:
+                            if isinstance(expert_samples[field], dict):
+                                for sub_key in expert_samples[field]:
+                                    sub_value = expert_samples[field][sub_key]
+                                    if isinstance(sub_value, list):
+                                        expert_samples[field][sub_key] = [item[indices] for item in sub_value]
+                                    else:
+                                        expert_samples[field][sub_key] = sub_value[indices]
+                            elif isinstance(expert_samples[field], list):
+                                expert_samples[field] = [item[indices] for item in expert_samples[field]]
+                            else:
+                                expert_samples[field] = expert_samples[field][indices]
 
         if self.device == 'cpu':
             assert batch_size == len(expert_samples["acts"])

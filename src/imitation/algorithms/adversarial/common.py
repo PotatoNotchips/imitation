@@ -618,12 +618,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     if isinstance(expert_samples[field][0], th.Tensor):  # If it's a PyTorch tensor
                         # Move to CPU, convert to NumPy, and back to GPU
                         np_array = expert_samples[field].cpu().numpy()
-                        expert_samples[field] = th.tensor(np_array, device="cuda:0")
+                        expert_samples[field] = th.tensor(np_array, device=self.device)
                         print("This is the type of current field:", type(expert_samples[field]))
                         print("This is the shape of current field:", expert_samples[field].shape)
                     elif isinstance(expert_samples[field][0], np.ndarray):  # If it's already a NumPy array
                         # Convert it back to a PyTorch tensor on the GPU
-                        expert_samples[field] = th.tensor(expert_samples[field], device="cuda:0")
+                        expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
                         print("This is the type of current field:", type(expert_samples[field]))
                         print("This is the shape of current field:", expert_samples[field].shape)
                 elif isinstance(expert_samples[field], dict):  # Handle nested dicts
@@ -631,14 +631,16 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         if isinstance(expert_samples[field][sub_key][0], th.Tensor):  # If it's a PyTorch tensor
                             # Move to CPU, convert to NumPy, and back to GPU
                             np_array = expert_samples[field][sub_key].cpu().numpy()
-                            expert_samples[field][sub_key] = th.tensor(np_array, device="cuda:0")
+                            expert_samples[field][sub_key] = th.tensor(np_array, device=self.device)
                             print("This is the type of current field:", type(expert_samples[field][sub_key]))
                             print("This is the shape of current field:", expert_samples[field][sub_key].shape)
                         elif isinstance(expert_samples[field][sub_key][0], np.ndarray):  # If it's already a NumPy array
                             # Convert it back to a PyTorch tensor on the GPU
-                            expert_samples[field][sub_key] = th.tensor(expert_samples[field][sub_key], device="cuda:0")
+                            expert_samples[field][sub_key] = th.tensor(expert_samples[field][sub_key], device=self.device)
                             print("This is the type of current field:", type(expert_samples[field][sub_key]))
                             print("This is the shape of current field:", expert_samples[field][sub_key].shape)
+                else:
+                    expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
 
         if self.device == 'cpu':
             if isinstance(gen_samples["obs"], dict):
@@ -702,11 +704,11 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 for sub_key in expert_samples[field]:
                                     sub_value = expert_samples[field][sub_key]
                                     if isinstance(sub_value, list):
-                                        expert_samples[field][sub_key] = [item[indices] for item in sub_value]
+                                        expert_samples[field][sub_key] = expert_samples[field][sub_key][indices]
                                     else:
-                                        expert_samples[field][sub_key] = sub_value[indices]
+                                        expert_samples[field][sub_key] = expert_samples[field][sub_key][indices]
                             elif isinstance(expert_samples[field], list):
-                                expert_samples[field] = [item[indices] for item in expert_samples[field]]
+                                expert_samples[field] = expert_samples[field][indices]
                             else:
                                 print("Currently in the else part!")
                                 print("This is the type of expert samples field:", type(expert_samples[field]))

@@ -757,15 +757,48 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 raise TypeError(f"Unsupported type in gen_batch[{field}][{sub_key}]: {type(value)}")
                     else:
                         # Handle flat fields like "acts", "dones", etc.
-                        value = gen_batch[field]
-                        if isinstance(value, th.Tensor):
-                            gen_batch[field] = value.to(self.device)
-                        elif isinstance(value, np.ndarray):
-                            gen_batch[field] = th.tensor(value, device=self.device)
-                        elif isinstance(value, list):
-                            gen_batch[field] = th.tensor(np.array(value), device=self.device)
-                        else:
-                            raise TypeError(f"Unsupported type in gen_batch[{field}]: {type(value)}")
+                        for field in gen_batch.keys():
+                            value = gen_batch[field]
+                            if isinstance(value, dict):
+                                # Handle dictionary fields (e.g., "obs" or "next_obs")
+                                for sub_key in value:
+                                    sub_value = value[sub_key]
+                                    if isinstance(sub_value, th.Tensor):
+                                        gen_batch[field][sub_key] = sub_value.to(self.device)
+                                    elif isinstance(sub_value, np.ndarray):
+                                        if sub_value.dtype == np.object_:
+                                            # Convert object array elements to tensors, keeping as a list
+                                            gen_batch[field][sub_key] = [
+                                                th.tensor(item, device=self.device) if isinstance(item, np.ndarray) else item.to(self.device)
+                                                for item in sub_value
+                                            ]
+                                        else:
+                                            gen_batch[field][sub_key] = th.tensor(sub_value, device=self.device)
+                                    elif isinstance(sub_value, list):
+                                        gen_batch[field][sub_key] = [
+                                            th.tensor(item, device=self.device) if isinstance(item, np.ndarray) else item.to(self.device)
+                                            for item in sub_value
+                                        ]
+                                    else:
+                                        raise TypeError(f"Unsupported type for gen_batch[{field}][{sub_key}]: {type(sub_value)}")
+                            elif isinstance(value, th.Tensor):
+                                gen_batch[field] = value.to(self.device)
+                            elif isinstance(value, np.ndarray):
+                                if value.dtype == np.object_:
+                                    # Convert object array elements to tensors, keeping as a list
+                                    gen_batch[field] = [
+                                        th.tensor(item, device=self.device) if isinstance(item, np.ndarray) else item.to(self.device)
+                                        for item in value
+                                    ]
+                                else:
+                                    gen_batch[field] = th.tensor(value, device=self.device)
+                            elif isinstance(value, list):
+                                gen_batch[field] = [
+                                    th.tensor(item, device=self.device) if isinstance(item, np.ndarray) else item.to(self.device)
+                                    for item in value
+                                ]
+                            else:
+                                raise TypeError(f"Unsupported type for gen_batch[{field}]: {type(value)}")
 
             if self.device == 'cpu':
                 # Concatenate rollouts, and label each row as expert or generator.

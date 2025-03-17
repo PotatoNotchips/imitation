@@ -839,19 +839,28 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             else:
                 # Concatenate rollouts
                 if isinstance(expert_batch["obs"], dict):
-                    obs = {k: th.cat([expert_batch["obs"][k], gen_batch["obs"][k]], dim=0) for k in expert_batch["obs"]}
+                    obs = {k: [th.cat([expert_batch["obs"][k][i], gen_batch["obs"][k][i]], dim=0) 
+                               for i in range(len(expert_batch["obs"][k]))] 
+                           for k in expert_batch["obs"]}
                 else:
-                    obs = th.cat([expert_batch["obs"], gen_batch["obs"]], dim=0)
+                    obs = [th.cat([expert_obs, gen_obs], dim=0) 
+                           for expert_obs, gen_obs in zip(expert_batch["obs"], gen_batch["obs"])]
                 
                 if isinstance(expert_batch["next_obs"], dict):
-                    next_obs = {k: th.cat([expert_batch["next_obs"][k], gen_batch["next_obs"][k]], dim=0) for k in expert_batch["next_obs"]}
+                    next_obs = {k: [th.cat([expert_batch["next_obs"][k][i], gen_batch["next_obs"][k][i]], dim=0) 
+                                    for i in range(len(expert_batch["next_obs"][k]))] 
+                                for k in expert_batch["next_obs"]}
                 else:
-                    next_obs = th.cat([expert_batch["next_obs"], gen_batch["next_obs"]], dim=0)
+                    next_obs = [th.cat([expert_next_obs, gen_next_obs], dim=0) 
+                                for expert_next_obs, gen_next_obs in zip(expert_batch["next_obs"], gen_batch["next_obs"])]
                 
-                acts = th.cat([expert_batch["acts"], gen_batch["acts"]], dim=0)
-                dones = th.cat([expert_batch["dones"], gen_batch["dones"]], dim=0)
+                acts = [th.cat([expert_acts, gen_acts], dim=0) 
+                        for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"])]
+                dones = [th.cat([expert_dones, gen_dones], dim=0) 
+                         for expert_dones, gen_dones in zip(expert_batch["dones"], gen_batch["dones"])]
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed
-                episode_starts = th.cat([expert_batch["episode_starts"], gen_batch["episode_starts"]], dim=0)
+                episode_starts = [th.cat([expert_starts, gen_starts], dim=0) 
+                                  for expert_starts, gen_starts in zip(expert_batch["episode_starts"], gen_batch["episode_starts"])]
                 
                 # Create labels as tensors on the same device
                 labels_expert_is_one = th.cat(

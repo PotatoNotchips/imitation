@@ -771,15 +771,19 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                             gen_batch[field][sub_key] = [
                                                 {k: th.tensor(v, device=self.device) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
                                                 if isinstance(item, dict)
-                                                else th.tensor(item, device=self.device) if isinstance(item, np.ndarray)
+                                                else th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer))
                                                 else item.to(self.device)
                                                 for item in sub_value
                                             ]
                                         else:
                                             gen_batch[field][sub_key] = th.tensor(sub_value, device=self.device)
                                     elif isinstance(sub_value, list):
+                                        # Handle lists, including potential dictionaries
                                         gen_batch[field][sub_key] = [
-                                            th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer)) else item.to(self.device)
+                                            {k: th.tensor(v, device=self.device) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
+                                            if isinstance(item, dict)
+                                            else th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer))
+                                            else item.to(self.device)
                                             for item in sub_value
                                         ]
                                     else:
@@ -792,15 +796,19 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                     gen_batch[field] = [
                                         {k: th.tensor(v, device=self.device) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
                                         if isinstance(item, dict)
-                                        else th.tensor(item, device=self.device) if isinstance(item, np.ndarray)
+                                        else th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer))
                                         else item.to(self.device)
                                         for item in value
                                     ]
                                 else:
                                     gen_batch[field] = th.tensor(value, device=self.device)
                             elif isinstance(value, list):
+                                # Handle lists, including potential dictionaries
                                 gen_batch[field] = [
-                                    th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer)) else item.to(self.device)
+                                    {k: th.tensor(v, device=self.device) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
+                                    if isinstance(item, dict)
+                                    else th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer))
+                                    else item.to(self.device)
                                     for item in value
                                 ]
                             else:

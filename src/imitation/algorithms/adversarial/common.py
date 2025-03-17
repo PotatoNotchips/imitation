@@ -863,7 +863,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed
                 episode_starts = [th.cat([expert_epi.unsqueeze(0) if expert_epi.dim() == 0 else expert_epi,
                                  gen_epi.unsqueeze(0) if gen_epi.dim() == 0 else gen_epi], dim=0)
-                         for expert_epi, gen_epi in zip(expert_batch["episode_starts"], xpert_batch["episode_starts"])]
+                         for expert_epi, gen_epi in zip(expert_batch["episode_starts"], expert_batch["episode_starts"])]
                 
                 # Create labels as tensors on the same device
                 labels_expert_is_one = th.cat(

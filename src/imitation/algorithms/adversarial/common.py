@@ -874,22 +874,42 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     dim=0,
                 )
 
-            # Calculate generator-policy log probabilities.
-            with th.no_grad():
-                #obs_th = th.as_tensor(obs, device=self.gen_algo.device)
-                obs_th = {key: th.as_tensor(value, device=self.gen_algo.device) for key, value in obs.items()}
-                acts_th = th.as_tensor(acts, device=self.gen_algo.device)
-                log_policy_act_prob = self._get_log_policy_act_prob(
-                    obs_th=obs_th, 
-                    acts_th=acts_th, 
-                    lstm_states=lstm_states, 
-                    episode_starts=episode_starts,)
-                if log_policy_act_prob is not None:
-                    assert len(log_policy_act_prob) == 2 * self.demo_minibatch_size
-                    log_policy_act_prob = log_policy_act_prob.reshape(
-                        (2 * self.demo_minibatch_size,),
+            if self.device != 'cpu':
+                # Calculate generator-policy log probabilities
+                with th.no_grad():
+                    if isinstance(obs, dict):
+                        obs_th = {key: [tensor.to(self.gen_algo.device) for tensor in value] for key, value in obs.items()}
+                    else:
+                        obs_th = [tensor.to(self.gen_algo.device) for tensor in obs]
+                    acts_th = [tensor.to(self.gen_algo.device) for tensor in acts]
+                    episode_starts_th = [tensor.to(self.gen_algo.device) for tensor in episode_starts]
+                    log_policy_act_prob = self._get_log_policy_act_prob(
+                        obs_th=obs_th, 
+                        acts_th=acts_th, 
+                        lstm_states=lstm_states, 
+                        episode_starts=episode_starts_th,
                     )
-                del obs_th, acts_th  # unneeded
+                    if log_policy_act_prob is not None:
+                        assert len(log_policy_act_prob) == 2 * self.demo_minibatch_size
+                        log_policy_act_prob = log_policy_act_prob.reshape((2 * self.demo_minibatch_size,))
+                    del obs_th, acts_th  # unneeded
+            else:
+                # Calculate generator-policy log probabilities.
+                with th.no_grad():
+                    #obs_th = th.as_tensor(obs, device=self.gen_algo.device)
+                    obs_th = {key: th.as_tensor(value, device=self.gen_algo.device) for key, value in obs.items()}
+                    acts_th = th.as_tensor(acts, device=self.gen_algo.device)
+                    log_policy_act_prob = self._get_log_policy_act_prob(
+                        obs_th=obs_th, 
+                        acts_th=acts_th, 
+                        lstm_states=lstm_states, 
+                        episode_starts=episode_starts,)
+                    if log_policy_act_prob is not None:
+                        assert len(log_policy_act_prob) == 2 * self.demo_minibatch_size
+                        log_policy_act_prob = log_policy_act_prob.reshape(
+                            (2 * self.demo_minibatch_size,),
+                        )
+                    del obs_th, acts_th  # unneeded
 
             obs_th, acts_th, next_obs_th, dones_th = self.reward_train.preprocess(
                 obs,

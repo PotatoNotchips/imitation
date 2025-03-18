@@ -868,8 +868,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 # Create labels as tensors on the same device
                 labels_expert_is_one = th.cat(
                     [
-                        th.ones(demo_minibatch_size, dtype=th.int, device=self.device),
-                        th.zeros(demo_minibatch_size, dtype=th.int, device=self.device),
+                        th.ones(self.demo_minibatch_size, dtype=th.int, device=self.device),
+                        th.zeros(self.demo_minibatch_size, dtype=th.int, device=self.device),
                     ],
                     dim=0,
                 )

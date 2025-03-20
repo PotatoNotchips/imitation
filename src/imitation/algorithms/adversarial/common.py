@@ -634,6 +634,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 else:
                     expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
 
+        print("Checking the first point that may get something worng with acts and dones:", expert_samples["acts"][0])
+        print("Checking the first point that may get something worng with acts and dones:", expert_samples["dones"][0])
+        
         if self.device == 'cpu':
             if isinstance(gen_samples["obs"], dict):
                 for sub_key in gen_samples["obs"]:
@@ -705,6 +708,11 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
                                 expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
 
+        print("Checking the second point that may get something worng with acts and dones:", expert_samples["acts"][0].shape)
+        print("Checking the second point that may get something worng with acts and dones:", expert_samples["dones"][0].shape)
+        print("Checking the second point that may get something worng with acts and dones:", expert_samples["acts"][0])
+        print("Checking the second point that may get something worng with acts and dones:", expert_samples["dones"][0])
+        
         if self.device == 'cpu':
             assert batch_size == len(expert_samples["acts"])
             assert batch_size == len(gen_samples["acts"])

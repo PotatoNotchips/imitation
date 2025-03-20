@@ -736,11 +736,11 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         for sub_key in gen_batch[field]:
                             value = gen_batch[field][sub_key]
                             if isinstance(value, th.Tensor):
-                                gen_batch[field][sub_key] = value.unsqueeze(0).to(self.device)  # Add dimension
+                                gen_batch[field][sub_key] = value.to(self.device)  
                             elif isinstance(value, np.ndarray):
-                                gen_batch[field][sub_key] = th.tensor(value, device=self.device).unsqueeze(0)  # Add dimension
+                                gen_batch[field][sub_key] = th.tensor(value, device=self.device) 
                             elif isinstance(value, list):
-                                gen_batch[field][sub_key] = th.tensor(np.array(value), device=self.device).unsqueeze(0)  # Add dimension
+                                gen_batch[field][sub_key] = th.tensor(np.array(value), device=self.device)
                             else:
                                 raise TypeError(f"Unsupported type in gen_batch[{field}][{sub_key}]: {type(value)}")
                     else:
@@ -752,39 +752,39 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 for sub_key in value:
                                     sub_value = value[sub_key]
                                     if isinstance(sub_value, th.Tensor):
-                                        gen_batch[field][sub_key] = sub_value.unsqueeze(0).to(self.device)  # Add dimension
+                                        gen_batch[field][sub_key] = sub_value.to(self.device)  
                                     elif isinstance(sub_value, np.ndarray):
                                         if sub_value.dtype == np.object_:
                                             # Convert object array elements, handling nested dictionaries and scalars
                                             gen_batch[field][sub_key] = [
-                                                {k: th.tensor(v, device=self.device).unsqueeze(0) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
+                                                {k: th.tensor(v, device=self.device) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
                                                 if isinstance(item, dict)
-                                                else th.tensor(item, device=self.device).unsqueeze(0) if isinstance(item, (np.ndarray, np.floating, np.integer))
+                                                else th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer))
                                                 else item.to(self.device)
                                                 for item in sub_value
                                             ]
                                         else:
-                                            gen_batch[field][sub_key] = th.tensor(sub_value, device=self.device).unsqueeze(0)  # Add dimension
+                                            gen_batch[field][sub_key] = th.tensor(sub_value, device=self.device)
                                     elif isinstance(sub_value, list):
                                         # Handle lists, including potential dictionaries
                                         gen_batch[field][sub_key] = [
-                                            {k: th.tensor(v, device=self.device).unsqueeze(0) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
+                                            {k: th.tensor(v, device=self.device) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
                                             if isinstance(item, dict)
-                                            else th.tensor(item, device=self.device).unsqueeze(0) if isinstance(item, (np.ndarray, np.floating, np.integer))
+                                            else th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer))
                                             else item.to(self.device)
                                             for item in sub_value
                                         ]
                                     else:
                                         raise TypeError(f"Unsupported type for gen_batch[{field}][{sub_key}]: {type(sub_value)}")
                             elif isinstance(value, th.Tensor):
-                                gen_batch[field] = value.unsqueeze(0).to(self.device)  # Add dimension
+                                gen_batch[field] = value.to(self.device) 
                             elif isinstance(value, np.ndarray):
                                 if value.dtype == np.object_:
                                     # Convert object array elements, handling nested dictionaries and scalars
                                     gen_batch[field] = [
-                                        {k: th.tensor(v, device=self.device).unsqueeze(0) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
+                                        {k: th.tensor(v, device=self.device) if isinstance(v, (np.ndarray, np.floating, np.integer)) else v.to(self.device) for k, v in item.items()}
                                         if isinstance(item, dict)
-                                        else th.tensor(item, device=self.device).unsqueeze(0) if isinstance(item, (np.ndarray, np.floating, np.integer))
+                                        else th.tensor(item, device=self.device) if isinstance(item, (np.ndarray, np.floating, np.integer))
                                         else item.to(self.device)
                                         for item in value
                                     ]
@@ -830,8 +830,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     obs = {
                         k: [
                             th.cat([
-                                expert_batch["obs"][k][i].unsqueeze(0) if expert_batch["obs"][k][i].dim() == 0 else expert_batch["obs"][k][i],
-                                gen_batch["obs"][k][i].unsqueeze(0) if gen_batch["obs"][k][i].dim() == 0 else gen_batch["obs"][k][i]
+                                expert_batch["obs"][k][i].unsqueeze(0) if expert_batch["obs"][k][i].dim() < 3 else expert_batch["obs"][k][i],
+                                gen_batch["obs"][k][i].unsqueeze(0) if gen_batch["obs"][k][i].dim() < 3 else gen_batch["obs"][k][i]
                             ], dim=0)
                             for i in range(len(expert_batch["obs"][k]))
                         ]
@@ -840,8 +840,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 else:
                     obs = [
                         th.cat([
-                            expert_obs.unsqueeze(0) if expert_obs.dim() == 0 else expert_obs,
-                            gen_obs.unsqueeze(0) if gen_obs.dim() == 0 else gen_obs
+                            expert_obs.unsqueeze(0) if expert_obs.dim() <3 else expert_obs,
+                            gen_obs.unsqueeze(0) if gen_obs.dim() < 3 else gen_obs
                         ], dim=0)
                         for expert_obs, gen_obs in zip(expert_batch["obs"], gen_batch["obs"])
                     ]
@@ -851,8 +851,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     next_obs = {
                         k: [
                             th.cat([
-                                expert_batch["next_obs"][k][i].unsqueeze(0) if expert_batch["next_obs"][k][i].dim() == 0 else expert_batch["next_obs"][k][i],
-                                gen_batch["next_obs"][k][i].unsqueeze(0) if gen_batch["next_obs"][k][i].dim() == 0 else gen_batch["next_obs"][k][i]
+                                expert_batch["next_obs"][k][i].unsqueeze(0) if expert_batch["next_obs"][k][i].dim() < 3 else expert_batch["next_obs"][k][i],
+                                gen_batch["next_obs"][k][i].unsqueeze(0) if gen_batch["next_obs"][k][i].dim() < 3 else gen_batch["next_obs"][k][i]
                             ], dim=0)
                             for i in range(len(expert_batch["next_obs"][k]))
                         ]
@@ -861,21 +861,21 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 else:
                     next_obs = [
                         th.cat([
-                            expert_next_obs.unsqueeze(0) if expert_next_obs.dim() == 0 else expert_next_obs,
-                            gen_next_obs.unsqueeze(0) if gen_next_obs.dim() == 0 else gen_next_obs
+                            expert_next_obs.unsqueeze(0) if expert_next_obs.dim() < 3 else expert_next_obs,
+                            gen_next_obs.unsqueeze(0) if gen_next_obs.dim() < 3 else gen_next_obs
                         ], dim=0)
                         for expert_next_obs, gen_next_obs in zip(expert_batch["next_obs"], gen_batch["next_obs"])
                     ]
                 
-                acts = [th.cat([expert_acts.unsqueeze(0) if expert_acts.dim() == 0 else expert_acts,
-                                gen_acts.unsqueeze(0) if gen_acts.dim() == 0 else gen_acts], dim=0)
+                acts = [th.cat([expert_acts.unsqueeze(0) if expert_acts.dim() < 2 else expert_acts,
+                                gen_acts.unsqueeze(0) if gen_acts.dim() < 2 else gen_acts], dim=0)
                         for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"])]
-                dones = [th.cat([expert_dones.unsqueeze(0) if expert_dones.dim() == 0 else expert_dones,
-                                 gen_dones.unsqueeze(0) if gen_dones.dim() == 0 else gen_dones], dim=0)
+                dones = [th.cat([expert_dones.unsqueeze(0) if expert_dones.dim() < 2 else expert_dones,
+                                 gen_dones.unsqueeze(0) if gen_dones.dim() < 2 else gen_dones], dim=0)
                          for expert_dones, gen_dones in zip(expert_batch["dones"], gen_batch["dones"])]
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed
-                episode_starts = [th.cat([expert_epi.unsqueeze(0) if expert_epi.dim() == 0 else expert_epi,
-                                 gen_epi.unsqueeze(0) if gen_epi.dim() == 0 else gen_epi], dim=0)
+                episode_starts = [th.cat([expert_epi.unsqueeze(0) if expert_epi.dim() < 2 else expert_epi,
+                                 gen_epi.unsqueeze(0) if gen_epi.dim() < 2 else gen_epi], dim=0)
                          for expert_epi, gen_epi in zip(expert_batch["episode_starts"], expert_batch["episode_starts"])]
                 
                 # Create labels as tensors on the same device

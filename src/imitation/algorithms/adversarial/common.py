@@ -868,17 +868,17 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     ]
 
                 print("Checking the shape of expert acts:", len(expert_batch["acts"]))
-                print("Checking the shape of expert acts 0:", len(expert_batch["acts"][0]))
+                print("Checking the shape of expert acts 0:", expert_batch["acts"][0].shape)
                 print("Checking the shape of gen acts:", len(gen_batch["acts"]))
-                print("Checking the shape of gen acts 0:", len(gen_batch["acts"][0]))
+                print("Checking the shape of gen acts 0:", gen_batch["acts"][0].shape)
                 print("Checking the shape of expert dones:", len(expert_batch["dones"]))
-                print("Checking the shape of expert dones 0:", len(expert_batch["dones"][0]))
+                print("Checking the shape of expert dones 0:", expert_batch["dones"][0].shape)
                 print("Checking the shape of gen dones:", len(gen_batch["dones"]))
-                print("Checking the shape of gen dones 0:", len(gen_batch["dones"][0]))
+                print("Checking the shape of gen dones 0:", gen_batch["dones"][0].shape)
                 print("Checking the shape of expert epi:", len(expert_batch["episode_starts"]))
-                print("Checking the shape of expert epi 0:", len(expert_batch["episode_starts"][0]))
+                print("Checking the shape of expert epi 0:", expert_batch["episode_starts"][0].shape)
                 print("Checking the shape of gen epi:", len(expert_batch["episode_starts"]))
-                print("Checking the shape of gen epi 0:", len(expert_batch["episode_starts"][0]))
+                print("Checking the shape of gen epi 0:", expert_batch["episode_starts"][0].shape)
                 
                 acts = [th.cat([expert_acts.unsqueeze(0) if expert_acts.dim() == 1 else expert_acts,
                                 gen_acts.unsqueeze(0) if gen_acts.dim() == 1 else gen_acts], dim=0)

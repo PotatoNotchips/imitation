@@ -866,16 +866,23 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         ], dim=0)
                         for expert_next_obs, gen_next_obs in zip(expert_batch["next_obs"], gen_batch["next_obs"])
                     ]
+
+                print("Checking the shape of expert acts:", expert_batch["acts"].shape)
+                print("Checking the shape of gen acts:", gen_batch["acts"].shape)
+                print("Checking the shape of expert dones:", expert_batch["dones"].shape)
+                print("Checking the shape of gen dones:", gen_batch["dones"].shape)
+                print("Checking the shape of expert epi:", expert_batch["episode_starts"].shape)
+                print("Checking the shape of gen epi:", expert_batch["episode_starts"].shape)
                 
-                acts = [th.cat([expert_acts.unsqueeze(0) if expert_acts.dim() < 2 else expert_acts,
-                                gen_acts.unsqueeze(0) if gen_acts.dim() < 2 else gen_acts], dim=0)
+                acts = [th.cat([expert_acts.unsqueeze(0) if expert_acts.dim() == 1 else expert_acts,
+                                gen_acts.unsqueeze(0) if gen_acts.dim() == 1 else gen_acts], dim=0)
                         for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"])]
-                dones = [th.cat([expert_dones.unsqueeze(0) if expert_dones.dim() < 2 else expert_dones,
-                                 gen_dones.unsqueeze(0) if gen_dones.dim() < 2 else gen_dones], dim=0)
+                dones = [th.cat([expert_dones.unsqueeze(0) if expert_dones.dim() == 1 else expert_dones,
+                                 gen_dones.unsqueeze(0) if gen_dones.dim() == 1 else gen_dones], dim=0)
                          for expert_dones, gen_dones in zip(expert_batch["dones"], gen_batch["dones"])]
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed
-                episode_starts = [th.cat([expert_epi.unsqueeze(0) if expert_epi.dim() < 2 else expert_epi,
-                                 gen_epi.unsqueeze(0) if gen_epi.dim() < 2 else gen_epi], dim=0)
+                episode_starts = [th.cat([expert_epi.unsqueeze(0) if expert_epi.dim() == 1 else expert_epi,
+                                 gen_epi.unsqueeze(0) if gen_epi.dim() == 1 else gen_epi], dim=0)
                          for expert_epi, gen_epi in zip(expert_batch["episode_starts"], expert_batch["episode_starts"])]
                 
                 # Create labels as tensors on the same device

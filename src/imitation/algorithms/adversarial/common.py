@@ -867,12 +867,18 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         for expert_next_obs, gen_next_obs in zip(expert_batch["next_obs"], gen_batch["next_obs"])
                     ]
 
-                print("Checking the shape of expert acts:", expert_batch["acts"].shape)
-                print("Checking the shape of gen acts:", gen_batch["acts"].shape)
-                print("Checking the shape of expert dones:", expert_batch["dones"].shape)
-                print("Checking the shape of gen dones:", gen_batch["dones"].shape)
-                print("Checking the shape of expert epi:", expert_batch["episode_starts"].shape)
-                print("Checking the shape of gen epi:", expert_batch["episode_starts"].shape)
+                print("Checking the shape of expert acts:", len(expert_batch["acts"]))
+                print("Checking the shape of expert acts 0:", len(expert_batch["acts"][0]))
+                print("Checking the shape of gen acts:", len(gen_batch["acts"]))
+                print("Checking the shape of gen acts 0:", len(gen_batch["acts"][0]))
+                print("Checking the shape of expert dones:", len(expert_batch["dones"]))
+                print("Checking the shape of expert dones 0:", len(expert_batch["dones"][0]))
+                print("Checking the shape of gen dones:", len(gen_batch["dones"]))
+                print("Checking the shape of gen dones 0:", len(gen_batch["dones"][0]))
+                print("Checking the shape of expert epi:", len(expert_batch["episode_starts"]))
+                print("Checking the shape of expert epi 0:", len(expert_batch["episode_starts"][0]))
+                print("Checking the shape of gen epi:", len(expert_batch["episode_starts"]))
+                print("Checking the shape of gen epi 0:", len(expert_batch["episode_starts"][0]))
                 
                 acts = [th.cat([expert_acts.unsqueeze(0) if expert_acts.dim() == 1 else expert_acts,
                                 gen_acts.unsqueeze(0) if gen_acts.dim() == 1 else gen_acts], dim=0)

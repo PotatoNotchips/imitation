@@ -596,6 +596,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         gen_samples = dict(gen_samples)
         
         # After populating expert_samples
+        print("Initialized expert samples acts type:", type(expert_samples["acts"]))
+        print("Initialized expert samples dones type:", type(expert_samples["dones"]))
         print("Initialized expert samples acts:", expert_samples["acts"])
         print("Initialized expert samples dones:", expert_samples["dones"])
         print("Initialized expert samples acts type:", type(expert_samples["acts"][0]))
@@ -616,8 +618,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     print("This is d[k] after detach numpy:", d[k])
 
         # Shape checks before processing
-        print("Checking the first point that may get something wrong with acts and dones:", expert_samples["acts"][0].shape)
-        print("Checking the first point that may get something wrong with acts and dones:", expert_samples["dones"][0].shape)
+        print("Checking the first point that may get something wrong with acts and dones type:", type(expert_samples["acts"]))
+        print("Checking the first point that may get something wrong with acts and dones type :", type(expert_samples["dones"]))
+        print("Checking the first point that may get something wrong with acts and dones:", expert_samples["acts"])
+        print("Checking the first point that may get something wrong with acts and dones:", expert_samples["dones"])
+        print("Checking the first point that may get something wrong with acts and dones inside:", expert_samples["acts"][0].shape)
+        print("Checking the first point that may get something wrong with acts and dones inside:", expert_samples["dones"][0].shape)
         
         # In _make_disc_train_batches, before the loop over fields
         if self.device == 'cpu':

@@ -594,9 +594,10 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         # Guarantee that Mapping arguments are in mutable form.
         expert_samples = dict(expert_samples)
         gen_samples = dict(gen_samples)
-
-        print("Checking the acts and dones that not being preprocessed:", expert_samples["acts"])
-        print("Checking the acts and dones that not being preprocessed:", expert_samples["dones"])
+        
+        # After populating expert_samples
+        print("Initialized expert samples acts:", expert_samples["acts"])
+        print("Initialized expert samples dones:", expert_samples["dones"])
         
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):
@@ -605,8 +606,15 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 continue
             for d in [gen_samples, expert_samples]:
                 if isinstance(d[k], th.Tensor):
+                    if d[k].numel() == 0:  # Check for empty tensor
+                        print(f"Warning: {k} tensor is empty.")
+                        continue  # Skip if empty
                     d[k] = d[k].detach().numpy()
 
+        # Shape checks before processing
+        print("Checking the first point that may get something wrong with acts and dones:", expert_samples["acts"][0].shape)
+        print("Checking the first point that may get something wrong with acts and dones:", expert_samples["dones"][0].shape)
+        
         # In _make_disc_train_batches, before the loop over fields
         if self.device == 'cpu':
             for field in expert_samples:
@@ -637,10 +645,10 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 else:
                     expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
                     
-        print("Checking the first point that may get something worng with acts and dones:", expert_samples["acts"][0].shape)
-        print("Checking the first point that may get something worng with acts and dones:", expert_samples["dones"][0].shape)
-        print("Checking the first point that may get something worng with acts and dones:", expert_samples["acts"][0])
-        print("Checking the first point that may get something worng with acts and dones:", expert_samples["dones"][0])
+        print("Checking the second point that may get something worng with acts and dones:", expert_samples["acts"][0].shape)
+        print("Checking the second point that may get something worng with acts and dones:", expert_samples["dones"][0].shape)
+        print("Checking the second point that may get something worng with acts and dones:", expert_samples["acts"][0])
+        print("Checking the second point that may get something worng with acts and dones:", expert_samples["dones"][0])
         
         if self.device == 'cpu':
             if isinstance(gen_samples["obs"], dict):
@@ -713,10 +721,10 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
                                 expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
 
-        print("Checking the second point that may get something worng with acts and dones:", expert_samples["acts"][0].shape)
-        print("Checking the second point that may get something worng with acts and dones:", expert_samples["dones"][0].shape)
-        print("Checking the second point that may get something worng with acts and dones:", expert_samples["acts"][0])
-        print("Checking the second point that may get something worng with acts and dones:", expert_samples["dones"][0])
+        print("Checking the third point that may get something worng with acts and dones:", expert_samples["acts"][0].shape)
+        print("Checking the third point that may get something worng with acts and dones:", expert_samples["dones"][0].shape)
+        print("Checking the third point that may get something worng with acts and dones:", expert_samples["acts"][0])
+        print("Checking the third point that may get something worng with acts and dones:", expert_samples["dones"][0])
         
         if self.device == 'cpu':
             assert batch_size == len(expert_samples["acts"])

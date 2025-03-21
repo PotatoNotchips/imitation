@@ -595,14 +595,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         expert_samples = dict(expert_samples)
         gen_samples = dict(gen_samples)
         
-        # After populating expert_samples
-        print("Initialized expert samples acts type:", type(expert_samples["acts"]))
-        print("Initialized expert samples dones type:", type(expert_samples["dones"]))
-        print("Initialized expert samples acts:", expert_samples["acts"])
-        print("Initialized expert samples dones:", expert_samples["dones"])
-        print("Initialized expert samples acts type:", type(expert_samples["acts"][0]))
-        print("Initialized expert samples dones type:", type(expert_samples["dones"][0]))
-        
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):
             k = field.name
@@ -615,15 +607,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         print(f"Warning: {k} tensor is empty. Initializing with default values.")
                         continue  # Skip conversion for empty tensors
                     d[k] = d[k].detach().numpy()
-                    print("This is d[k] after detach numpy:", d[k])
-
-        # Shape checks before processing
-        print("Checking the first point that may get something wrong with acts and dones type:", type(expert_samples["acts"]))
-        print("Checking the first point that may get something wrong with acts and dones type :", type(expert_samples["dones"]))
-        print("Checking the first point that may get something wrong with acts and dones:", expert_samples["acts"])
-        print("Checking the first point that may get something wrong with acts and dones:", expert_samples["dones"])
-        print("Checking the first point that may get something wrong with acts and dones inside:", expert_samples["acts"][0].shape)
-        print("Checking the first point that may get something wrong with acts and dones inside:", expert_samples["dones"][0].shape)
         
         # In _make_disc_train_batches, before the loop over fields
         if self.device == 'cpu':
@@ -653,12 +636,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             # Convert it back to a PyTorch tensor on the GPU
                             expert_samples[field][sub_key] = th.tensor(expert_samples[field][sub_key], device=self.device)
                 else:
-                    expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
-                    
-        print("Checking the second point that may get something worng with acts and dones:", expert_samples["acts"][0].shape)
-        print("Checking the second point that may get something worng with acts and dones:", expert_samples["dones"][0].shape)
-        print("Checking the second point that may get something worng with acts and dones:", expert_samples["acts"][0])
-        print("Checking the second point that may get something worng with acts and dones:", expert_samples["dones"][0])
+                    expert_samples[field] = th.tensor([expert_samples[field]], device=self.device)
         
         if self.device == 'cpu':
             if isinstance(gen_samples["obs"], dict):
@@ -730,11 +708,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             else:
                                 expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
                                 expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
-
-        print("Checking the third point that may get something worng with acts and dones:", expert_samples["acts"][0].shape)
-        print("Checking the third point that may get something worng with acts and dones:", expert_samples["dones"][0].shape)
-        print("Checking the third point that may get something worng with acts and dones:", expert_samples["acts"][0])
-        print("Checking the third point that may get something worng with acts and dones:", expert_samples["dones"][0])
         
         if self.device == 'cpu':
             assert batch_size == len(expert_samples["acts"])
@@ -897,25 +870,10 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         ], dim=0)
                         for expert_next_obs, gen_next_obs in zip(expert_batch["next_obs"], gen_batch["next_obs"])
                     ]
-
-                print("Checking the shape of expert acts:", len(expert_batch["acts"]))
-                print("Checking the shape of expert acts 0:", expert_batch["acts"][0].shape)
-                print("Checking the shape of gen acts:", len(gen_batch["acts"]))
-                print("Checking the shape of gen acts 0:", gen_batch["acts"][0].shape)
-                print("Checking the shape of expert dones:", len(expert_batch["dones"]))
-                print("Checking the shape of expert dones 0:", expert_batch["dones"][0].shape)
-                print("Checking the shape of gen dones:", len(gen_batch["dones"]))
-                print("Checking the shape of gen dones 0:", gen_batch["dones"][0].shape)
-                print("Checking the shape of expert epi:", len(expert_batch["episode_starts"]))
-                print("Checking the shape of expert epi 0:", expert_batch["episode_starts"][0].shape)
-                print("Checking the shape of gen epi:", len(expert_batch["episode_starts"]))
-                print("Checking the shape of gen epi 0:", expert_batch["episode_starts"][0].shape)
                 
                 acts = []
                 for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"]):
                     # Print shapes for debugging
-                    print("Expert acts shape:", expert_acts.shape)
-                    print("Generated acts shape:", gen_acts.shape)
                 
                     # Adjust dimensions to ensure compatibility
                     expert_acts = expert_acts.unsqueeze(0) if expert_acts.dim() <= 1 else expert_acts
@@ -933,8 +891,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 dones = []
                 for expert_dones, gen_dones in zip(expert_batch["dones"], gen_batch["dones"]):
                     # Print shapes for debugging
-                    print("Expert dones shape:", expert_dones.shape)
-                    print("Generated dones shape:", gen_dones.shape)
                 
                     expert_dones = expert_dones.unsqueeze(0) if expert_dones.dim() <= 1 else expert_dones
                     gen_dones = gen_dones.unsqueeze(0) if gen_dones.dim() == 1 else gen_dones

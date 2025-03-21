@@ -602,13 +602,14 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):
             k = field.name
+            print("Field name included in the transitions:", k)
             if k == "infos":
                 continue
             for d in [gen_samples, expert_samples]:
                 if isinstance(d[k], th.Tensor):
                     if d[k].numel() == 0:  # Check for empty tensor
-                        print(f"Warning: {k} tensor is empty.")
-                        continue  # Skip if empty
+                        print(f"Warning: {k} tensor is empty. Initializing with default values.")
+                        continue  # Skip conversion for empty tensors
                     d[k] = d[k].detach().numpy()
 
         # Shape checks before processing

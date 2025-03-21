@@ -598,7 +598,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):
             k = field.name
-            print("Field name included in the transitions:", k)
             if k == "infos":
                 continue
             for d in [gen_samples, expert_samples]:
@@ -691,6 +690,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     total_size = expert_samples["acts"][0].shape[0]  # Use shape[0] of first tensor in list
                 else:
                     total_size = expert_samples["acts"].shape[0]
+                    print("Checking the total size:", total_size)
                 
                 if total_size > batch_size:
                     indices = th.randperm(total_size, device=self.device)[:batch_size]
@@ -704,6 +704,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                     else:
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
                             elif isinstance(expert_samples[field], list):
+                                expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
+                            elif isinstance(expert_samples[field], th.Tensor):
                                 expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
                             else:
                                 expert_samples[field] = th.tensor(expert_samples[field], device=self.device)

@@ -686,8 +686,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             # Handle array/list fields like "acts"
                             expert_samples[field] = expert_samples[field][indices]
         else:
-                if isinstance(expert_samples["acts"], list):
+                if isinstance(expert_samples["acts"], (th.Tensor, list)):
                     total_size = expert_samples["acts"][0].shape[0]  # Use shape[0] of first tensor in list
+                    print("Checking the total size:", total_size)
                 else:
                     total_size = expert_samples["acts"].shape[0]
                     print("Checking the total size:", total_size)

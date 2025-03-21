@@ -704,13 +704,16 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
                                     else:
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
-                            elif isinstance(expert_samples[field], list):
-                                expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
-                            elif isinstance(expert_samples[field], th.Tensor):
-                                expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
+                        elif isinstance(expert_samples[field], list):
+                            expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
+                        elif isinstance(expert_samples[field], th.Tensor):
+                            if expert_samples[field].shape[0] == 1:
+                                batch_size = len(indices)
+                                expert_samples[field] = expert_samples[field].repeat(batch_size, *([1] * (expert_samples[field].dim() - 1)))
                             else:
-                                expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
-                                expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
+                                expert_samples[field] = expert_samples[field][indices]
+                        else:
+                            expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
         
         if self.device == 'cpu':
             assert batch_size == len(expert_samples["acts"])

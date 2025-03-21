@@ -893,10 +893,10 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 print("Checking the shape of gen epi:", len(expert_batch["episode_starts"]))
                 print("Checking the shape of gen epi 0:", expert_batch["episode_starts"][0].shape)
                 
-                acts = [th.cat([expert_acts.unsqueeze(0) if expert_acts.dim() == 1 else expert_acts,
+                acts = [th.cat([expert_acts.unsqueeze(0).unsqueeze(1) if expert_acts.dim() == 0 else expert_acts,
                                 gen_acts.unsqueeze(0) if gen_acts.dim() == 1 else gen_acts], dim=0)
                         for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"])]
-                dones = [th.cat([expert_dones.unsqueeze(0) if expert_dones.dim() == 1 else expert_dones,
+                dones = [th.cat([expert_dones.unsqueeze(0).unsqueeze(1) if expert_dones.dim() == 0 else expert_dones,
                                  gen_dones.unsqueeze(0) if gen_dones.dim() == 1 else gen_dones], dim=0)
                          for expert_dones, gen_dones in zip(expert_batch["dones"], gen_batch["dones"])]
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed

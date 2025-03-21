@@ -598,6 +598,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         # After populating expert_samples
         print("Initialized expert samples acts:", expert_samples["acts"])
         print("Initialized expert samples dones:", expert_samples["dones"])
+        print("Initialized expert samples acts type:", type(expert_samples["acts"][0]))
+        print("Initialized expert samples dones type:", type(expert_samples["dones"][0]))
         
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):
@@ -611,6 +613,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         print(f"Warning: {k} tensor is empty. Initializing with default values.")
                         continue  # Skip conversion for empty tensors
                     d[k] = d[k].detach().numpy()
+                    print("This is d[k] after detach numpy:", d[k])
 
         # Shape checks before processing
         print("Checking the first point that may get something wrong with acts and dones:", expert_samples["acts"][0].shape)

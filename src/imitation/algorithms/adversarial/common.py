@@ -594,6 +594,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         # Guarantee that Mapping arguments are in mutable form.
         expert_samples = dict(expert_samples)
         gen_samples = dict(gen_samples)
+
+        print("Checking the acts and dones that not being preprocessed:", expert_samples["acts"])
+        print("Checking the acts and dones that not being preprocessed:", expert_samples["dones"])
         
         # Convert applicable Tensor values to NumPy.
         for field in dataclasses.fields(types.Transitions):
@@ -633,7 +636,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             expert_samples[field][sub_key] = th.tensor(expert_samples[field][sub_key], device=self.device)
                 else:
                     expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
-
+                    
+        print("Checking the first point that may get something worng with acts and dones:", expert_samples["acts"][0].shape)
+        print("Checking the first point that may get something worng with acts and dones:", expert_samples["dones"][0].shape)
         print("Checking the first point that may get something worng with acts and dones:", expert_samples["acts"][0])
         print("Checking the first point that may get something worng with acts and dones:", expert_samples["dones"][0])
         

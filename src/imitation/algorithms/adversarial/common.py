@@ -893,21 +893,42 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 print("Checking the shape of gen epi:", len(expert_batch["episode_starts"]))
                 print("Checking the shape of gen epi 0:", expert_batch["episode_starts"][0].shape)
                 
-                acts = [
-                    th.cat([
-                        expert_acts.unsqueeze(0).unsqueeze(1) if expert_acts.dim() == 0 else expert_acts.unsqueeze(0) if expert_acts.dim() == 1 else expert_acts,
-                        gen_acts.unsqueeze(0) if gen_acts.dim() == 1 else gen_acts
-                    ], dim=0)
-                    for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"])
-                ]
+                acts = []
+                for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"]):
+                    # Print shapes for debugging
+                    print("Expert acts shape:", expert_acts.shape)
+                    print("Generated acts shape:", gen_acts.shape)
                 
-                dones = [
-                    th.cat([
-                        expert_dones.unsqueeze(0).unsqueeze(1) if expert_dones.dim() == 0 else expert_dones.unsqueeze(0) if expert_dones.dim() == 1 else expert_dones,
-                        gen_dones.unsqueeze(0) if gen_dones.dim() == 1 else gen_dones
-                    ], dim=0)
-                    for expert_dones, gen_dones in zip(expert_batch["dones"], gen_batch["dones"])
-                ]
+                    # Adjust dimensions to ensure compatibility
+                    expert_acts = expert_acts.unsqueeze(0) if expert_acts.dim() <= 1 else expert_acts
+                    gen_acts = gen_acts.unsqueeze(0) if gen_acts.dim() == 1 else gen_acts
+                
+                    # Reshape if needed
+                    if expert_acts.shape[1:] != gen_acts.shape[1:]:
+                        if expert_acts.shape[1] == 1:
+                            expert_acts = expert_acts.expand(-1, gen_acts.shape[1], -1)
+                        elif gen_acts.shape[1] == 1:
+                            gen_acts = gen_acts.expand(-1, expert_acts.shape[1], -1)
+                
+                    acts.append(th.cat([expert_acts, gen_acts], dim=0))
+                
+                dones = []
+                for expert_dones, gen_dones in zip(expert_batch["dones"], gen_batch["dones"]):
+                    # Print shapes for debugging
+                    print("Expert dones shape:", expert_dones.shape)
+                    print("Generated dones shape:", gen_dones.shape)
+                
+                    expert_dones = expert_dones.unsqueeze(0) if expert_dones.dim() <= 1 else expert_dones
+                    gen_dones = gen_dones.unsqueeze(0) if gen_dones.dim() == 1 else gen_dones
+                
+                    if expert_dones.shape[1:] != gen_dones.shape[1:]:
+                        if expert_dones.shape[1] == 1:
+                            expert_dones = expert_dones.expand(-1, gen_dones.shape[1])
+                        elif gen_dones.shape[1] == 1:
+                            gen_dones = gen_dones.expand(-1, expert_dones.shape[1])
+                
+                    dones.append(th.cat([expert_dones, gen_dones], dim=0))
+                    
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed
                 episode_starts = [th.cat([expert_epi.unsqueeze(0) if expert_epi.dim() == 1 else expert_epi,
                                  gen_epi.unsqueeze(0) if gen_epi.dim() == 1 else gen_epi], dim=0)

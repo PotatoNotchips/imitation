@@ -689,9 +689,11 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 if isinstance(expert_samples["acts"], (th.Tensor, list)):
                     total_size = expert_samples["acts"][0].shape[0]  # Use shape[0] of first tensor in list
                     print("Checking the total size:", total_size)
+                    print("Checking the dim shape of samples acts before slicing:", expert_samples["acts"].shape)
                 else:
                     total_size = expert_samples["acts"].shape[0]
                     print("Checking the total size:", total_size)
+                    print("Checking the dim shape of samples acts before slicing:", expert_samples["acts"].shape)
                 
                 if total_size > batch_size:
                     indices = th.randperm(total_size, device=self.device)[:batch_size]
@@ -707,6 +709,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         elif isinstance(expert_samples[field], list):
                             expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
                         elif isinstance(expert_samples[field], th.Tensor):
+                            print("Checking the dim number of the field:", expert_samples[field].dim())
                             if expert_samples[field].dim() == 1:
                                 expert_samples[field] = expert_samples[field][indices]
                             else:
@@ -714,6 +717,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 expert_samples[field] = expert_samples[field][:, indices]
                         else:
                             expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
+
+                print("Checking the dim shape of samples acts after slicing:", expert_samples["acts"].shape)
         
         if self.device == 'cpu':
             assert batch_size == len(expert_samples["acts"])

@@ -876,7 +876,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         ], dim=0)
                         for expert_next_obs, gen_next_obs in zip(expert_batch["next_obs"], gen_batch["next_obs"])
                     ]
-                
+
+                print(f"expert batch acts shape before unsqueeze: {expert_batch["acts"].shape}")
+                print(f"gen batch acts shape before unsqueeze: {gen_batch["acts"].shape}")
                 acts = []
                 for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"]):
                     # Print shapes for debugging
@@ -891,7 +893,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                             expert_acts = expert_acts.expand(-1, gen_acts.shape[1], -1)
                         elif gen_acts.shape[1] == 1:
                             gen_acts = gen_acts.expand(-1, expert_acts.shape[1], -1)
-                
+
+                    print(f"expert_acts shape: {expert_acts.shape}")
+                    print(f"gen_acts shape before expand: {gen_acts.shape}")
                     acts.append(th.cat([expert_acts, gen_acts], dim=0))
                 
                 dones = []

@@ -707,11 +707,11 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         elif isinstance(expert_samples[field], list):
                             expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
                         elif isinstance(expert_samples[field], th.Tensor):
-                            if expert_samples[field].shape[0] == 1:
-                                batch_size = len(indices)
-                                expert_samples[field] = expert_samples[field].repeat(batch_size, *([1] * (expert_samples[field].dim() - 1)))
-                            else:
+                            if expert_samples[field].dim() == 1:
                                 expert_samples[field] = expert_samples[field][indices]
+                            else:
+                                # Slice along dim=1 instead of dim=0
+                                expert_samples[field] = expert_samples[field][:, indices]
                         else:
                             expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
         

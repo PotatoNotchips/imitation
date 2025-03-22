@@ -938,39 +938,55 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
 
                 print(f"expert batch acts shape before unsqueeze: {expert_batch['acts'].shape}")
                 print(f"gen batch acts shape before unsqueeze: {gen_batch['acts'].shape}")
-                acts = []
+                acts_pairs = []
                 for expert_acts, gen_acts in zip(expert_batch["acts"], gen_batch["acts"]):
-                    # Print shapes for debugging
-                
-                    # Adjust dimensions to ensure compatibility
+                    # Adjust dimensions to ensure at least 2D (batch, features)
                     expert_acts = expert_acts.unsqueeze(0) if expert_acts.dim() <= 1 else expert_acts
                     gen_acts = gen_acts.unsqueeze(0) if gen_acts.dim() == 1 else gen_acts
                 
-                    # Reshape if needed
+                    # Check and handle feature dimension mismatch
                     if expert_acts.shape[1:] != gen_acts.shape[1:]:
                         if expert_acts.shape[1] == 1:
                             expert_acts = expert_acts.expand(-1, gen_acts.shape[1], -1)
                         elif gen_acts.shape[1] == 1:
                             gen_acts = gen_acts.expand(-1, expert_acts.shape[1], -1)
-
+                
+                    # Debugging shapes
                     print(f"expert_acts shape: {expert_acts.shape}")
-                    print(f"gen_acts shape before expand: {gen_acts.shape}")
-                    acts.append(th.cat([expert_acts, gen_acts], dim=0))
+                    print(f"gen_acts shape: {gen_acts.shape}")
                 
-                dones = []
+                    # Concatenate the pair along the batch dimension
+                    pair_acts = th.cat([expert_acts, gen_acts], dim=0)
+                    acts_pairs.append(pair_acts)
+                
+                # Concatenate all pairs into a single tensor
+                acts = th.cat(acts_pairs, dim=0)
+                print(f"Final acts shape: {acts.shape}")
+                
+                dones_pairs = []
                 for expert_dones, gen_dones in zip(expert_batch["dones"], gen_batch["dones"]):
-                    # Print shapes for debugging
-                
+                    # Adjust dimensions to ensure at least 2D
                     expert_dones = expert_dones.unsqueeze(0) if expert_dones.dim() <= 1 else expert_dones
                     gen_dones = gen_dones.unsqueeze(0) if gen_dones.dim() == 1 else gen_dones
                 
+                    # Check and handle feature dimension mismatch
                     if expert_dones.shape[1:] != gen_dones.shape[1:]:
                         if expert_dones.shape[1] == 1:
                             expert_dones = expert_dones.expand(-1, gen_dones.shape[1])
                         elif gen_dones.shape[1] == 1:
                             gen_dones = gen_dones.expand(-1, expert_dones.shape[1])
                 
-                    dones.append(th.cat([expert_dones, gen_dones], dim=0))
+                    # Debugging shapes
+                    print(f"expert_dones shape: {expert_dones.shape}")
+                    print(f"gen_dones shape: {gen_dones.shape}")
+                
+                    # Concatenate the pair along the batch dimension
+                    pair_dones = th.cat([expert_dones, gen_dones], dim=0)
+                    dones_pairs.append(pair_dones)
+                
+                # Concatenate all pairs into a single tensor
+                dones = th.cat(dones_pairs, dim=0)
+                print(f"Final dones shape: {dones.shape}")
                     
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed
                 episode_starts = [th.cat([expert_epi.unsqueeze(0) if expert_epi.dim() == 1 else expert_epi,

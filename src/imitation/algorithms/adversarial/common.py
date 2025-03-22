@@ -625,15 +625,26 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     elif isinstance(expert_samples[field][0], np.ndarray):  # If it's already a NumPy array
                         # Convert it back to a PyTorch tensor on the GPU
                         expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
-                elif isinstance(expert_samples[field], dict):  # Handle nested dicts
+                elif isinstance(expert_samples[field], dict):
                     for sub_key in expert_samples[field]:
-                        if isinstance(expert_samples[field][sub_key][0], th.Tensor):  # If it's a PyTorch tensor
-                            # Move to CPU, convert to NumPy, and back to GPU
-                            np_array = expert_samples[field][sub_key].cpu().numpy()
-                            expert_samples[field][sub_key] = th.tensor(np_array, device=self.device)
-                        elif isinstance(expert_samples[field][sub_key][0], np.ndarray):  # If it's already a NumPy array
-                            # Convert it back to a PyTorch tensor on the GPU
-                            expert_samples[field][sub_key] = th.tensor(expert_samples[field][sub_key], device=self.device)
+                        if isinstance(expert_samples[field][sub_key], list):
+                            # Handle a list of tensors or NumPy arrays
+                            if all(isinstance(item, th.Tensor) for item in expert_samples[field][sub_key]):
+                                # Convert each tensor in the list to a NumPy array, then to a tensor on the device
+                                np_arrays = [item.cpu().numpy() for item in expert_samples[field][sub_key]]
+                                expert_samples[field][sub_key] = [th.tensor(np_array, device=self.device) 
+                                                                 for np_array in np_arrays]
+                            elif all(isinstance(item, np.ndarray) for item in expert_samples[field][sub_key]):
+                                # Convert each NumPy array in the list to a tensor on the device
+                                expert_samples[field][sub_key] = [th.tensor(item, device=self.device) 
+                                                                 for item in expert_samples[field][sub_key]]
+                        elif isinstance(expert_samples[field][sub_key], th.Tensor):
+                            # Handle a single tensor by moving it to the device
+                            expert_samples[field][sub_key] = expert_samples[field][sub_key].to(self.device)
+                        elif isinstance(expert_samples[field][sub_key], np.ndarray):
+                            # Handle a single NumPy array by converting it to a tensor on the device
+                            expert_samples[field][sub_key] = th.tensor(expert_samples[field][sub_key], 
+                                                                      device=self.device)
                 else:
                     expert_samples[field] = th.tensor([expert_samples[field]], device=self.device)
         

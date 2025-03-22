@@ -788,6 +788,8 @@ class ShapedRewardNet(ForwardWrapper):
         print("Checking the details of old_shaping_output:", old_shaping_output)
         
         new_shaping = (1 - done.float()) * new_shaping_output
+        print("Checking the shape of new shaping:", new_shaping.shape)
+        
         final_rew = (
             base_reward_net_output
             + self.discount_factor * new_shaping

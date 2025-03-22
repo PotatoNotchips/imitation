@@ -778,10 +778,13 @@ class ShapedRewardNet(ForwardWrapper):
         # that does not preserve the optimal policy if the episodes have variable
         # length!
         print("Checking the type of base reward net output:", type(base_reward_net_output))
+        print("Checking the shape of base reward net output:", base_reward_net_output.shape)
         print("Checking the details of base reward net output:", base_reward_net_output)
         print("Checking the type of new_shaping_output:", type(new_shaping_output))
+        print("Checking the shape of new_shaping_output:", new_shaping_output.shape)
         print("Checking the details of new_shaping_output:", new_shaping_output)
         print("Checking the type of old_shaping_output:", type(old_shaping_output))
+        print("Checking the shape of old_shaping_output:", old_shaping_output.shape)
         print("Checking the details of old_shaping_output:", old_shaping_output)
         
         new_shaping = (1 - done.float()) * new_shaping_output

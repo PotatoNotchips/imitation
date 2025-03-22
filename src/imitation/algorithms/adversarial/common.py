@@ -722,7 +722,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                     else:
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
                             elif isinstance(expert_samples[field], list):
-                                if expert_samples[field].shape[1] > expert_samples[field].shape[0]:
+                                if expert_samples[field][0].shape[1] > expert_samples[field][0].shape[0]:
                                     expert_samples[field] = [expert_samples[field][:, i] for i in indices.tolist()]
                                 else:
                                     expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]

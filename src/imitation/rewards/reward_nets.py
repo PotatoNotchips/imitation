@@ -804,6 +804,7 @@ class ShapedRewardNet(ForwardWrapper):
             expected_shape = state.shape[:1]
 
         print("Checking the final rew shape:", final_rew.shape)
+        print("Checking the details of final rew:", final_rew)
         print("Checking the expected shape:", expected_shape)
         
         assert final_rew.shape == expected_shape

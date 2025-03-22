@@ -938,7 +938,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
 
                 print(f"expert batch acts shape before unsqueeze: {expert_batch['acts'].shape}")
                 print(f"gen batch acts shape before unsqueeze: {gen_batch['acts'].shape}")
-                acts = th.cat([expert_batch["acts"].swapaxes(0, 1), gen_batch["acts"]].swapaxes(0, 1), dim=0)
+                acts = th.cat([expert_batch["acts"].swapaxes(0, 1), gen_batch["acts"].swapaxes(0, 1)], dim=0)
                 print(f"Final acts shape: {acts.shape}")
                 
                 # Ensure dones are 2D tensors and concatenate
@@ -946,7 +946,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 gen_dones = gen_batch["dones"].unsqueeze(1) if gen_batch["dones"].dim() == 1 else gen_batch["dones"]
                 print(f"expert_dones shape: {expert_dones.shape}")
                 print(f"gen_dones shape: {gen_dones.shape}")
-                dones = th.cat([expert_dones.swapaxes(0, 1), gen_dones].swapaxes(0, 1), dim=0)
+                dones = th.cat([expert_dones.swapaxes(0, 1), gen_dones.swapaxes(0, 1)], dim=0)
                 print(f"Final dones shape: {dones.shape}")
                     
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed

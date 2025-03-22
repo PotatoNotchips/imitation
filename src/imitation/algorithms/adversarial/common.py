@@ -848,45 +848,93 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             else:
                 # Concatenate rollouts for obs
                 if isinstance(expert_batch["obs"], dict):
+                    # Print shapes before processing
+                    print("Before processing obs (dictionary):")
+                    for k in expert_batch["obs"]:
+                        print(f"  {k}:")
+                        for i, tensor in enumerate(expert_batch["obs"][k]):
+                            print(f"    expert[{i}]: {tensor.shape}")
+                        for i, tensor in enumerate(gen_batch["obs"][k]):
+                            print(f"    gen[{i}]: {tensor.shape}")
+                    
+                    # Process and concatenate into a single tensor per key
                     obs = {
-                        k: [
+                        k: th.cat([
                             th.cat([
                                 expert_batch["obs"][k][i].unsqueeze(0) if expert_batch["obs"][k][i].dim() < 3 else expert_batch["obs"][k][i],
                                 gen_batch["obs"][k][i].unsqueeze(0) if gen_batch["obs"][k][i].dim() < 3 else gen_batch["obs"][k][i]
                             ], dim=0)
                             for i in range(len(expert_batch["obs"][k]))
-                        ]
+                        ], dim=0)
                         for k in expert_batch["obs"]
                     }
+                    
+                    # Print shapes after processing
+                    print("After processing obs (dictionary):")
+                    for k in obs:
+                        print(f"  {k}: {obs[k].shape}")
                 else:
-                    obs = [
+                    # Print shapes before processing
+                    print("Before processing obs (list):")
+                    for i, (expert_obs, gen_obs) in enumerate(zip(expert_batch["obs"], gen_batch["obs"])):
+                        print(f"  Pair {i}: expert={expert_obs.shape}, gen={gen_obs.shape}")
+                    
+                    # Process and concatenate into a single tensor
+                    obs = th.cat([
                         th.cat([
-                            expert_obs.unsqueeze(0) if expert_obs.dim() <3 else expert_obs,
+                            expert_obs.unsqueeze(0) if expert_obs.dim() < 3 else expert_obs,
                             gen_obs.unsqueeze(0) if gen_obs.dim() < 3 else gen_obs
                         ], dim=0)
                         for expert_obs, gen_obs in zip(expert_batch["obs"], gen_batch["obs"])
-                    ]
+                    ], dim=0)
+                    
+                    # Print shape after processing
+                    print(f"After processing obs (list): {obs.shape}")
                 
-                # Concatenate rollouts for next_obs
+                # Process next_obs
                 if isinstance(expert_batch["next_obs"], dict):
+                    # Print shapes before processing
+                    print("Before processing next_obs (dictionary):")
+                    for k in expert_batch["next_obs"]:
+                        print(f"  {k}:")
+                        for i, tensor in enumerate(expert_batch["next_obs"][k]):
+                            print(f"    expert[{i}]: {tensor.shape}")
+                        for i, tensor in enumerate(gen_batch["next_obs"][k]):
+                            print(f"    gen[{i}]: {tensor.shape}")
+                    
+                    # Process and concatenate into a single tensor per key
                     next_obs = {
-                        k: [
+                        k: th.cat([
                             th.cat([
                                 expert_batch["next_obs"][k][i].unsqueeze(0) if expert_batch["next_obs"][k][i].dim() < 3 else expert_batch["next_obs"][k][i],
                                 gen_batch["next_obs"][k][i].unsqueeze(0) if gen_batch["next_obs"][k][i].dim() < 3 else gen_batch["next_obs"][k][i]
                             ], dim=0)
                             for i in range(len(expert_batch["next_obs"][k]))
-                        ]
+                        ], dim=0)
                         for k in expert_batch["next_obs"]
                     }
+                    
+                    # Print shapes after processing
+                    print("After processing next_obs (dictionary):")
+                    for k in next_obs:
+                        print(f"  {k}: {next_obs[k].shape}")
                 else:
-                    next_obs = [
+                    # Print shapes before processing
+                    print("Before processing next_obs (list):")
+                    for i, (expert_next_obs, gen_next_obs) in enumerate(zip(expert_batch["next_obs"], gen_batch["next_obs"])):
+                        print(f"  Pair {i}: expert={expert_next_obs.shape}, gen={gen_next_obs.shape}")
+                    
+                    # Process and concatenate into a single tensor
+                    next_obs = th.cat([
                         th.cat([
                             expert_next_obs.unsqueeze(0) if expert_next_obs.dim() < 3 else expert_next_obs,
                             gen_next_obs.unsqueeze(0) if gen_next_obs.dim() < 3 else gen_next_obs
                         ], dim=0)
                         for expert_next_obs, gen_next_obs in zip(expert_batch["next_obs"], gen_batch["next_obs"])
-                    ]
+                    ], dim=0)
+                    
+                    # Print shape after processing
+                    print(f"After processing next_obs (list): {next_obs.shape}")
 
                 print(f"expert batch acts shape before unsqueeze: {expert_batch['acts'].shape}")
                 print(f"gen batch acts shape before unsqueeze: {gen_batch['acts'].shape}")

@@ -941,12 +941,20 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             if self.device != 'cpu':
                 # Calculate generator-policy log probabilities
                 with th.no_grad():
-                    if isinstance(obs, dict):
-                        obs_th = {key: [tensor.to(self.gen_algo.device) for tensor in value] for key, value in obs.items()}
-                    else:
-                        obs_th = [tensor.to(self.gen_algo.device) for tensor in obs]
-                    acts_th = [tensor.to(self.gen_algo.device) for tensor in acts]
-                    episode_starts_th = [tensor.to(self.gen_algo.device) for tensor in episode_starts]
+                    #if isinstance(obs, dict):
+                        #obs_th = {key: [tensor.to(self.gen_algo.device) for tensor in value] for key, value in obs.items()}
+                    #else:
+                        #obs_th = [tensor.to(self.gen_algo.device) for tensor in obs]
+                    #acts_th = [tensor.to(self.gen_algo.device) for tensor in acts]
+                    #episode_starts_th = [tensor.to(self.gen_algo.device) for tensor in episode_starts]
+                    obs_th = {key: th.stack([tensor.to(self.gen_algo.device) for tensor in value], dim=0) for key, value in obs.items()}
+                    acts_th = th.stack([tensor.to(self.gen_algo.device) for tensor in acts], dim=0)
+                    episode_starts_th = th.stack([tensor.to(self.gen_algo.device) for tensor in episode_starts], dim=0)
+                    print("Shapes of obs_th (dictionary of tensors):")
+                    for key, tensor in obs_th.items():
+                        print(f"  {key}: shape={tensor.shape}, dim={tensor.dim()}")
+                    print(f"Shape of acts_th: {acts_th.shape}, dim={acts_th.dim()}")
+                    print(f"Shape of episode_starts_th: {episode_starts_th.shape}, dim={episode_starts_th.dim()}")
                     log_policy_act_prob = self._get_log_policy_act_prob(
                         obs_th=obs_th, 
                         acts_th=acts_th, 
@@ -961,15 +969,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 # Calculate generator-policy log probabilities.
                 with th.no_grad():
                     #obs_th = th.as_tensor(obs, device=self.gen_algo.device)
-                    #obs_th = {key: th.as_tensor(value, device=self.gen_algo.device) for key, value in obs.items()}
-                    #acts_th = th.as_tensor(acts, device=self.gen_algo.device)
-                    obs_th = {key: th.stack([tensor.to(self.gen_algo.device) for tensor in value], dim=0) for key, value in obs.items()}
-                    acts_th = th.stack([tensor.to(self.gen_algo.device) for tensor in acts], dim=0)
-                    print("Shapes of obs_th (dictionary of tensors):")
-                    for key, tensor in obs_th.items():
-                        print(f"  {key}: shape={tensor.shape}, dim={tensor.dim()}")
-                    print(f"Shape of acts_th: {acts_th.shape}, dim={acts_th.dim()}")
-                    print(f"Shape of episode_starts_th: {episode_starts_th.shape}, dim={episode_starts_th.dim()}")
+                    obs_th = {key: th.as_tensor(value, device=self.gen_algo.device) for key, value in obs.items()}
+                    acts_th = th.as_tensor(acts, device=self.gen_algo.device)
                     log_policy_act_prob = self._get_log_policy_act_prob(
                         obs_th=obs_th, 
                         acts_th=acts_th, 

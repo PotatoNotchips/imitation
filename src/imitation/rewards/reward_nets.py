@@ -786,7 +786,10 @@ class ShapedRewardNet(ForwardWrapper):
         print("Checking the type of old_shaping_output:", type(old_shaping_output))
         print("Checking the shape of old_shaping_output:", old_shaping_output.shape)
         print("Checking the details of old_shaping_output:", old_shaping_output)
-        
+
+        # avoid the final rew shape to be inconsistent
+        if done.ndim > 1:
+            done = done[0]
         new_shaping = (1 - done.float()) * new_shaping_output
         print("Checking the shape of done:", done.shape)
         print("Checking for the result of 1 - done.float():", (1 - done.float()))

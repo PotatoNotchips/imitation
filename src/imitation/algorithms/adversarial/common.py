@@ -710,17 +710,19 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
                                     else:
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
-                        elif isinstance(expert_samples[field], list):
-                            expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
-                        elif isinstance(expert_samples[field], th.Tensor):
-                            print("Checking the dim number of the field:", expert_samples[field].dim())
-                            if expert_samples[field].dim() == 1:
-                                expert_samples[field] = expert_samples[field][indices]
+                            elif isinstance(expert_samples[field], list):
+                                expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
+                            elif isinstance(expert_samples[field], th.Tensor):
+                                print("Checking the dim number of the field:", expert_samples[field].dim())
+                                if expert_samples[field].dim() == 1:
+                                    expert_samples[field] = expert_samples[field][indices]
+                                else:
+                                    # Slice along dim=1 instead of dim=0
+                                    expert_samples[field] = expert_samples[field][:, indices]
                             else:
-                                # Slice along dim=1 instead of dim=0
-                                expert_samples[field] = expert_samples[field][:, indices]
+                                expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
                         else:
-                            expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
+                            print("Detected a field that is not in the list of expert samples.")
 
                 print("Checking the dim shape of samples acts after slicing:", expert_samples["acts"].shape)
         

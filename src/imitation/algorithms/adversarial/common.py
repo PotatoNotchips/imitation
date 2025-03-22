@@ -722,10 +722,10 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                     else:
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
                             elif isinstance(expert_samples[field], list):
-                                if expert_samples[field][0].shape[1] > expert_samples[field][0].shape[0]:
-                                    expert_samples[field] = [expert_samples[field][:, i] for i in indices.tolist()]
-                                else:
+                                try:
                                     expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
+                                except IndexError:
+                                    expert_samples[field][0] = [expert_samples[field][0][:, i] for i in indices.tolist()]
                             elif isinstance(expert_samples[field], th.Tensor):
                                 print("Checking the dim number of the field:", expert_samples[field].dim())
                                 if expert_samples[field].dim() == 1:

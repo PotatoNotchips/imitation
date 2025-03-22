@@ -689,11 +689,15 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 if isinstance(expert_samples["acts"], (th.Tensor, list)):
                     total_size = expert_samples["acts"][0].shape[0]  # Use shape[0] of first tensor in list
                     print("Checking the total size:", total_size)
+                    print("Chekcing the type of samples acts as well:", type(expert_samples["acts"]))
+                    print("Checking the length of samples acts:", len(expert_samples["acts"]))
                     print("Checking the dim shape of samples acts before slicing:", expert_samples["acts"].shape)
                 else:
                     total_size = expert_samples["acts"].shape[0]
                     print("Checking the total size:", total_size)
+                    print("Chekcing the type of samples acts as well:", type(expert_samples["acts"]))
                     print("Checking the dim shape of samples acts before slicing:", expert_samples["acts"].shape)
+                    print("Checking the length of samples acts:", len(expert_samples["acts"]))
                 
                 if total_size > batch_size:
                     indices = th.randperm(total_size, device=self.device)[:batch_size]

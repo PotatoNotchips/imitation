@@ -261,16 +261,10 @@ class Buffer:
         n_samples = num_samples(data)
         assert n_samples <= self.capacity - self._idx
         idx_hi = self._idx + n_samples
-        print("This is the type of _array: ", type(self._arrays))
-        print("This is the _array: ", self._arrays)
         for k, arr in data.items():
-            print("This is arr: ", arr)
-            print("This is shape of arr: ", arr.shape)
             # Ensure k is a tuple for nested keys
             if isinstance(k, tuple):
                 outer_key, inner_key = k
-                print("This is outer_key: ",outer_key)
-                print("This is inner_key: ",inner_key)
                 # Initialize nested dictionary if it does not exist
                 if outer_key not in self._arrays:
                     self._arrays[outer_key] = {}
@@ -279,15 +273,12 @@ class Buffer:
                     # If arr is a dictionary, handle each sub-array
                     for sub_key, sub_arr in arr.items():
                         if inner_key not in self._arrays[outer_key]:
-                            print("This is the k right now: :", k)
-                            print("Adding this inner_key: ", inner_key)
                             if arr.ndim == 2:
                                 self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1]))
                             elif arr.ndim == 3:
                                 self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1], arr.shape[2]))
                             else:
                                 raise ValueError(f"Unexpected array dimension {arr.ndim} for key {k}.")
-                            print(f"Storing data for key: ({outer_key}, {sub_key}), shape of arr: {sub_arr.shape}, type of arr: {type(sub_arr)}")
                             self._arrays[outer_key][inner_key][self._idx:idx_hi] = sub_arr
                 else:
                     # Ensure arr is a NumPy array
@@ -296,8 +287,7 @@ class Buffer:
                     
                     if inner_key not in self._arrays[outer_key]:
                         self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1]))  # Adjust shape as needed
-                    
-                    print(f"Storing data for key: {k}, shape of arr: {arr.shape}")
+
                     self._arrays[outer_key][inner_key][self._idx:idx_hi] = arr
     
             else:
@@ -313,10 +303,6 @@ class Buffer:
                     # If arr is a dictionary, handle each sub-array
                     for sub_key, sub_arr in arr.items():
                         if sub_key not in self._arrays[k]:
-                            print("This is the k right now: :", k)
-                            print("Adding this subkey: ",sub_key)
-                            print("Checking the type of _arrays[k]: ",type(self._arrays[k]))
-                            print("This is the arrays[k]: ",self._arrays[k])
                             # Adjust shape based on sub_arr dimension
                             if sub_arr.ndim == 2:
                                 self._arrays[k].update({sub_key: np.empty((self.capacity, sub_arr.shape[1]))})
@@ -324,12 +310,8 @@ class Buffer:
                                 self._arrays[k].update({sub_key: np.empty((self.capacity, sub_arr.shape[1], sub_arr.shape[2]))})
                             else:
                                 raise ValueError(f"Unexpected array dimension {sub_arr.ndim} for key {sub_key}.")
-                            print(f"Storing data for key: ({k}, {sub_key}), shape of arr: {sub_arr.shape}, type of arr: {type(sub_arr)}")
                             self._arrays[k][sub_key][self._idx:idx_hi] = sub_arr
                 else:
-                    print("Checking the type of _arrays[k]: ",type(self._arrays[k]))
-                    print("This is the arrays[k]: ",self._arrays[k])
-                    print(f"Storing data for key: {k}, shape of arr: {arr.shape}, type of arr: {type(arr)}")
                     self._arrays[k][self._idx:idx_hi] = arr
         self._idx = idx_hi % self.capacity
         self._n_data = min(self._n_data + n_samples, self.capacity)

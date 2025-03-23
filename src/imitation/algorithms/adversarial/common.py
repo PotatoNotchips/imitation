@@ -699,16 +699,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         else:
                 if isinstance(expert_samples["acts"], (th.Tensor, list)):
                     total_size = expert_samples["acts"][0].shape[0]  # Use shape[0] of first tensor in list
-                    print("Checking the total size:", total_size)
-                    print("Chekcing the type of samples acts as well:", type(expert_samples["acts"]))
-                    print("Checking the length of samples acts:", len(expert_samples["acts"]))
-                    print("Checking the dim shape of samples acts before slicing:", expert_samples["acts"].shape)
                 else:
                     total_size = expert_samples["acts"].shape[0]
-                    print("Checking the total size:", total_size)
-                    print("Chekcing the type of samples acts as well:", type(expert_samples["acts"]))
-                    print("Checking the dim shape of samples acts before slicing:", expert_samples["acts"].shape)
-                    print("Checking the length of samples acts:", len(expert_samples["acts"]))
                 
                 if total_size > batch_size:
                     indices = th.randperm(total_size, device=self.device)[:batch_size]
@@ -718,8 +710,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 for sub_key in expert_samples[field]:
                                     sub_value = expert_samples[field][sub_key]
                                     if isinstance(sub_value, list):
-                                        print("Checking for the sub value inside shape:", sub_value[0].shape)
-                                        print("Checking for the len of the sub value:", len(sub_value))
                                         if len(sub_value) == batch_size:
                                             continue
                                         else:
@@ -738,7 +728,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                     except IndexError:
                                         expert_samples[field][0] = [expert_samples[field][0][:, i] for i in indices.tolist()]
                             elif isinstance(expert_samples[field], th.Tensor):
-                                print("Checking the dim number of the field:", expert_samples[field].dim())
                                 if expert_samples[field].dim() == 1:
                                     expert_samples[field] = expert_samples[field][indices]
                                 else:
@@ -748,8 +737,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 expert_samples[field] = th.tensor(expert_samples[field], device=self.device)
                         else:
                             print("Detected a field that is not in the list of expert samples.")
-
-                print("Checking the dim shape of samples acts after slicing:", expert_samples["acts"].shape)
         
         if self.device == 'cpu':
             assert batch_size == len(expert_samples["acts"])
@@ -873,15 +860,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
             else:
                 # Concatenate rollouts for obs
                 if isinstance(expert_batch["obs"], dict):
-                    # Print shapes before processing
-                    print("Before processing obs (dictionary):")
-                    for k in expert_batch["obs"]:
-                        print(f"  {k}:")
-                        for i, tensor in enumerate(expert_batch["obs"][k]):
-                            print(f"    expert[{i}]: {tensor.shape}")
-                        for i, tensor in enumerate(gen_batch["obs"][k]):
-                            print(f"    gen[{i}]: {tensor.shape}")
-                    
                     # Process and concatenate into a single tensor per key
                     obs = {
                         k: th.cat([
@@ -893,17 +871,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         ], dim=0)
                         for k in expert_batch["obs"]
                     }
-                    
-                    # Print shapes after processing
-                    print("After processing obs (dictionary):")
-                    for k in obs:
-                        print(f"  {k}: {obs[k].shape}")
+
                 else:
-                    # Print shapes before processing
-                    print("Before processing obs (list):")
                     for i, (expert_obs, gen_obs) in enumerate(zip(expert_batch["obs"], gen_batch["obs"])):
-                        print(f"  Pair {i}: expert={expert_obs.shape}, gen={gen_obs.shape}")
-                    
                     # Process and concatenate into a single tensor
                     obs = th.cat([
                         th.cat([
@@ -912,21 +882,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         ], dim=0)
                         for expert_obs, gen_obs in zip(expert_batch["obs"], gen_batch["obs"])
                     ], dim=0)
-                    
-                    # Print shape after processing
-                    print(f"After processing obs (list): {obs.shape}")
                 
                 # Process next_obs
                 if isinstance(expert_batch["next_obs"], dict):
-                    # Print shapes before processing
-                    print("Before processing next_obs (dictionary):")
-                    for k in expert_batch["next_obs"]:
-                        print(f"  {k}:")
-                        for i, tensor in enumerate(expert_batch["next_obs"][k]):
-                            print(f"    expert[{i}]: {tensor.shape}")
-                        for i, tensor in enumerate(gen_batch["next_obs"][k]):
-                            print(f"    gen[{i}]: {tensor.shape}")
-                    
                     # Process and concatenate into a single tensor per key
                     next_obs = {
                         k: th.cat([
@@ -938,17 +896,8 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         ], dim=0)
                         for k in expert_batch["next_obs"]
                     }
-                    
-                    # Print shapes after processing
-                    print("After processing next_obs (dictionary):")
-                    for k in next_obs:
-                        print(f"  {k}: {next_obs[k].shape}")
+
                 else:
-                    # Print shapes before processing
-                    print("Before processing next_obs (list):")
-                    for i, (expert_next_obs, gen_next_obs) in enumerate(zip(expert_batch["next_obs"], gen_batch["next_obs"])):
-                        print(f"  Pair {i}: expert={expert_next_obs.shape}, gen={gen_next_obs.shape}")
-                    
                     # Process and concatenate into a single tensor
                     next_obs = th.cat([
                         th.cat([
@@ -957,29 +906,19 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         ], dim=0)
                         for expert_next_obs, gen_next_obs in zip(expert_batch["next_obs"], gen_batch["next_obs"])
                     ], dim=0)
-                    
-                    # Print shape after processing
-                    print(f"After processing next_obs (list): {next_obs.shape}")
 
-                print(f"expert batch acts shape before unsqueeze: {expert_batch['acts'].shape}")
-                print(f"gen batch acts shape before unsqueeze: {gen_batch['acts'].shape}")
                 acts = th.cat([expert_batch["acts"].swapaxes(0, 1), gen_batch["acts"].swapaxes(0, 1)], dim=0)
-                print(f"Final acts shape: {acts.shape}")
-                
+
                 # Ensure dones are 2D tensors and concatenate
                 expert_dones = expert_batch["dones"].unsqueeze(1) if expert_batch["dones"].dim() == 1 else expert_batch["dones"]
                 gen_dones = gen_batch["dones"].unsqueeze(1) if gen_batch["dones"].dim() == 1 else gen_batch["dones"]
-                print(f"expert_dones shape: {expert_dones.shape}")
-                print(f"gen_dones shape: {gen_dones.shape}")
                 dones = th.cat([expert_dones.swapaxes(0, 1), gen_dones.swapaxes(0, 1)], dim=0)
-                print(f"Final dones shape: {dones.shape}")
                     
                 lstm_states = expert_batch["lstm_states"]  # Assuming no concatenation needed
                 
                 # Fix typo and concatenate episode_starts directly
                 expert_epi = expert_batch["episode_starts"].unsqueeze(1) if expert_batch["episode_starts"].dim() == 1 else expert_batch["episode_starts"]
                 episode_starts = th.cat([expert_epi.swapaxes(0, 1), expert_epi.swapaxes(0, 1)], dim=0)
-                print(f"Final episode_starts shape: {episode_starts.shape}")
                 
                 # Create labels as tensors on the same device
                 labels_expert_is_one = th.cat(
@@ -1002,11 +941,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     obs_th = {key: th.stack([tensor.to(self.gen_algo.device) for tensor in value], dim=0) for key, value in obs.items()}
                     acts_th = th.stack([tensor.to(self.gen_algo.device) for tensor in acts], dim=0)
                     episode_starts_th = th.stack([tensor.to(self.gen_algo.device) for tensor in episode_starts], dim=0)
-                    print("Shapes of obs_th (dictionary of tensors):")
-                    for key, tensor in obs_th.items():
-                        print(f"  {key}: shape={tensor.shape}, dim={tensor.dim()}")
-                    print(f"Shape of acts_th: {acts_th.shape}, dim={acts_th.dim()}")
-                    print(f"Shape of episode_starts_th: {episode_starts_th.shape}, dim={episode_starts_th.dim()}")
                     log_policy_act_prob = self._get_log_policy_act_prob(
                         obs_th=obs_th, 
                         acts_th=acts_th, 
@@ -1049,14 +983,5 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                 "labels_expert_is_one": self._torchify_array(labels_expert_is_one),
                 "log_policy_act_prob": log_policy_act_prob,
             }
-            
-            print("Checking inputs to logits_expert_is_high:")
-            print("state stock obs:", th.isnan(batch_dict["state"]["stock_obs"]).any(), th.isinf(batch_dict["state"]["stock_obs"]).any())
-            print("state additional info:", th.isnan(batch_dict["state"]["additional_info"]).any(), th.isinf(batch_dict["state"]["additional_info"]).any())
-            print("action:", th.isnan(batch_dict["action"]).any(), th.isinf(batch_dict["action"]).any())
-            print("next_state stock obs:", th.isnan(batch_dict["next_state"]["stock_obs"]).any(), th.isinf(batch_dict["next_state"]["stock_obs"]).any())
-            print("next_state additional info:", th.isnan(batch_dict["next_state"]["additional_info"]).any(), th.isinf(batch_dict["next_state"]["additional_info"]).any())
-            print("done:", th.isnan(batch_dict["done"]).any(), th.isinf(batch_dict["done"]).any())
-            print("log_policy_act_prob:", th.isnan(log_policy_act_prob).any(), th.isinf(log_policy_act_prob).any())
 
             yield batch_dict

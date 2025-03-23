@@ -265,6 +265,9 @@ class Buffer:
             # Ensure k is a tuple for nested keys
             if isinstance(k, tuple):
                 outer_key, inner_key = k
+                print(f"outer_key: {outer_key}, type: {type(outer_key)}")
+                print(f"inner_key: {inner_key}, type: {type(inner_key)}")
+                print(f"self._arrays[{outer_key}] type: {type(self._arrays.get(outer_key))}")
                 # Initialize nested dictionary if it does not exist
                 if outer_key not in self._arrays:
                     self._arrays[outer_key] = {}

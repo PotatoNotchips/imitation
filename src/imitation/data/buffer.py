@@ -268,6 +268,7 @@ class Buffer:
                 print(f"outer_key: {outer_key}, type: {type(outer_key)}")
                 print(f"inner_key: {inner_key}, type: {type(inner_key)}")
                 print(f"self._arrays[{outer_key}] type: {type(self._arrays.get(outer_key))}")
+                print("Checking the outer key shape:", self._arrays.get(outer_key).shape)
                 # Initialize nested dictionary if it does not exist
                 if outer_key not in self._arrays:
                     self._arrays[outer_key] = {}
@@ -287,6 +288,9 @@ class Buffer:
                     # Ensure arr is a NumPy array
                     if not isinstance(arr, np.ndarray):
                         raise ValueError(f"Expected NumPy array for key {k}, but got {type(arr)}.")
+
+                    print("Checking the arr shape right now:", arr.shape)
+                    print("Checking the arr details right now:", arr)
                     
                     if inner_key not in self._arrays[outer_key]:
                         self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1]))  # Adjust shape as needed

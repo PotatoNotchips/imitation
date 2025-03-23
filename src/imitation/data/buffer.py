@@ -210,7 +210,8 @@ class Buffer:
                 if arr.shape[1:] != self.sample_shapes[k]:
                     raise ValueError(f"Wrong data shape for {k}")
         '''
-
+        print("Checking for the data that is in the store function but not pass to store easy yet:", data)
+        
         new_idx = self._idx + n_samples
         if new_idx > self.capacity:
             n_remain = self.capacity - self._idx

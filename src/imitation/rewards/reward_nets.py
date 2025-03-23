@@ -777,23 +777,10 @@ class ShapedRewardNet(ForwardWrapper):
         # series of remaining potential shapings can lead to reward shaping
         # that does not preserve the optimal policy if the episodes have variable
         # length!
-        print("Checking the type of base reward net output:", type(base_reward_net_output))
-        print("Checking the shape of base reward net output:", base_reward_net_output.shape)
-        print("Checking the details of base reward net output:", base_reward_net_output)
-        print("Checking the type of new_shaping_output:", type(new_shaping_output))
-        print("Checking the shape of new_shaping_output:", new_shaping_output.shape)
-        print("Checking the details of new_shaping_output:", new_shaping_output)
-        print("Checking the type of old_shaping_output:", type(old_shaping_output))
-        print("Checking the shape of old_shaping_output:", old_shaping_output.shape)
-        print("Checking the details of old_shaping_output:", old_shaping_output)
-
         # avoid the final rew shape to be inconsistent
         if done.ndim > 1:
             done = done[0]
         new_shaping = (1 - done.float()) * new_shaping_output
-        print("Checking the shape of done:", done.shape)
-        print("Checking for the result of 1 - done.float():", (1 - done.float()))
-        print("Checking the shape of new shaping:", new_shaping.shape)
         
         final_rew = (
             base_reward_net_output
@@ -803,14 +790,9 @@ class ShapedRewardNet(ForwardWrapper):
         if isinstance(state, dict):
             # Use the shape of the first tensor in the state dictionary
             expected_shape = list(state.values())[0].shape[:1]
-            print("Chekcing the shape of the state value:", list(state.values()))
         else:
             # Use the state tensor shape directly
             expected_shape = state.shape[:1]
-
-        print("Checking the final rew shape:", final_rew.shape)
-        print("Checking the details of final rew:", final_rew)
-        print("Checking the expected shape:", expected_shape)
         
         assert final_rew.shape == expected_shape
         return final_rew

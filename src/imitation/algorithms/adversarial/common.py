@@ -875,7 +875,6 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                     }
 
                 else:
-                    for i, (expert_obs, gen_obs) in enumerate(zip(expert_batch["obs"], gen_batch["obs"])):
                     # Process and concatenate into a single tensor
                     obs = th.cat([
                         th.cat([

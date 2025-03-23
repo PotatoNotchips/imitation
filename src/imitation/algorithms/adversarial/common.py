@@ -720,17 +720,23 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                     if isinstance(sub_value, list):
                                         print("Checking for the sub value inside shape:", sub_value[0].shape)
                                         print("Checking for the len of the sub value:", len(sub_value))
-                                        try:
-                                            expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
-                                        except IndexError:
-                                            expert_samples[field][sub_key][0] = [expert_samples[field][sub_key][0][:, i] for i in indices.tolist()]
+                                        if len(sub_value) == batch_size:
+                                            continue
+                                        else:
+                                            try:
+                                                expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
+                                            except IndexError:
+                                                expert_samples[field][sub_key][0] = [expert_samples[field][sub_key][0][:, i] for i in indices.tolist()]
                                     else:
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
                             elif isinstance(expert_samples[field], list):
-                                try:
-                                    expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
-                                except IndexError:
-                                    expert_samples[field][0] = [expert_samples[field][0][:, i] for i in indices.tolist()]
+                                if len(expert_samples[field]) == batch_size:
+                                    continue
+                                else:
+                                    try:
+                                        expert_samples[field] = [expert_samples[field][i] for i in indices.tolist()]
+                                    except IndexError:
+                                        expert_samples[field][0] = [expert_samples[field][0][:, i] for i in indices.tolist()]
                             elif isinstance(expert_samples[field], th.Tensor):
                                 print("Checking the dim number of the field:", expert_samples[field].dim())
                                 if expert_samples[field].dim() == 1:

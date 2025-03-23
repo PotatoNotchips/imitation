@@ -262,12 +262,17 @@ class Buffer:
         assert n_samples <= self.capacity - self._idx
         idx_hi = self._idx + n_samples
         for k, arr in data.items():
+            print("Checking what's the data mean:", type(data))
+            print("Checking what's the data actually is:", data)
+            print("Checking what's the k mean:", type(k))
+            print("Checking what's the k actually is:", k)
             # Ensure k is a tuple for nested keys
             if isinstance(k, tuple):
                 outer_key, inner_key = k
                 print(f"outer_key: {outer_key}, type: {type(outer_key)}")
                 print(f"inner_key: {inner_key}, type: {type(inner_key)}")
                 print(f"self._arrays[{outer_key}] type: {type(self._arrays.get(outer_key))}")
+                print(f"self._arrays[{outer_key}] deails: {(self._arrays.get(outer_key))}")
                 print("Checking the outer key shape:", self._arrays.get(outer_key).shape)
                 # Initialize nested dictionary if it does not exist
                 if outer_key not in self._arrays:

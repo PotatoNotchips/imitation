@@ -718,7 +718,12 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                                 for sub_key in expert_samples[field]:
                                     sub_value = expert_samples[field][sub_key]
                                     if isinstance(sub_value, list):
-                                        expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
+                                        print("Checking for the sub value inside shape:", sub_value[0].shape)
+                                        print("Checking for the len of the sub value:", len(sub_value))
+                                        try:
+                                            expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
+                                        except IndexError:
+                                            expert_samples[field][sub_key][0] = [expert_samples[field][sub_key][0][:, i] for i in indices.tolist()]
                                     else:
                                         expert_samples[field][sub_key] = [expert_samples[field][sub_key][i] for i in indices.tolist()]
                             elif isinstance(expert_samples[field], list):

@@ -434,7 +434,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
         self._check_fixed_horizon(ep_lens)
         gen_samples = rollout.flatten_trajectories_with_rew(gen_trajs)
         print(f"Buffer capacity: {self._gen_replay_buffer.capacity}")
-        print(f"Number of transitions in gen_samples: {len(gen_samples['obs'])}")
+        print(f"Number of transitions in gen_samples: {gen_samples}")
         self._gen_replay_buffer.store(gen_samples)
 
     def train(

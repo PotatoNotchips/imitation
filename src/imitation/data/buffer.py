@@ -220,7 +220,7 @@ class Buffer:
             if any(isinstance(arr, (dict, DictObs)) for arr in data.values()):
                 # Flatten and store for dictionary entries
                 for k, arr in list(data.items()):
-                    pritn("Checking for the details of k from data.items:", k)
+                    print("Checking for the details of k from data.items:", k)
                     print("Checking for the details of arr from data.items:", arr)
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():

@@ -98,9 +98,19 @@ class Buffer:
             raise KeyError("sample_shape and dtypes keys don't match")
         self.capacity = capacity
         self.sample_shapes = {k: tuple(shape) for k, shape in sample_shapes.items()}
+        #self._arrays = {
+            #k: np.zeros((capacity,) + shape, dtype=dtypes[k])
+            #for k, shape in self.sample_shapes.items()
+        #}
+        # Manual Define the arrays
         self._arrays = {
-            k: np.zeros((capacity,) + shape, dtype=dtypes[k])
-            for k, shape in self.sample_shapes.items()
+            "obs": {"stock_obs": np.zeros((capacity,) + (390, 33), dtype=np.float32),
+                    "additional_info": np.zeros((capacity,) + (4,), dtype=np.float32)},
+            "acts": np.zeros((capacity,) + (3,)),
+            "next_obs": {"stock_obs": np.zeros((capacity,) + (390, 33), dtype=np.float32),
+                    "additional_info": np.zeros((capacity,) + (4,), dtype=np.float32)},
+            "dones": np.zeros((capacity,) + (), dtype=np.dtype(bool)),
+            "infos": np.zeros((capacity,) + (), dtype=np.dtype(object))
         }
         self._n_data = 0
         self._idx = 0

@@ -218,10 +218,15 @@ class Buffer:
             # Need to loop around the buffer. Break into two "easy" calls.
             # Handle storage for both dict and non-dict formats
             if any(isinstance(arr, (dict, DictObs)) for arr in data.values()):
+                print("Checking for the details of arr from data.values:", arr)
                 # Flatten and store for dictionary entries
                 for k, arr in list(data.items()):
+                    pritn("Checking for the details of k from data.items:", k)
+                    print("Checking for the details of arr from data.items:", arr)
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
+                            print("Checking for the details of sub_k from arr.items:", sub_k)
+                            print("Checking for the details of sub_arr from arr.items:", sub_arr)
                             # Store the sub-arrays directly under their nested keys
                             nested_key = (k, sub_k)  # Use a tuple for nested keys
                             self._store_easy({nested_key: sub_arr[:n_remain]})

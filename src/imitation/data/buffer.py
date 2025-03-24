@@ -218,7 +218,6 @@ class Buffer:
             # Need to loop around the buffer. Break into two "easy" calls.
             # Handle storage for both dict and non-dict formats
             if any(isinstance(arr, (dict, DictObs)) for arr in data.values()):
-                print("Checking for the details of arr from data.values:", arr)
                 # Flatten and store for dictionary entries
                 for k, arr in list(data.items()):
                     pritn("Checking for the details of k from data.items:", k)

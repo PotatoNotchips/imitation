@@ -288,7 +288,6 @@ class Buffer:
                 print(f"inner_key: {inner_key}, type: {type(inner_key)}")
                 print(f"self._arrays[{outer_key}] type: {type(self._arrays.get(outer_key))}")
                 print(f"self._arrays[{outer_key}] deails: {(self._arrays.get(outer_key))}")
-                print("Checking the outer key shape:", self._arrays.get(outer_key).shape)
                 # Initialize nested dictionary if it does not exist
                 if outer_key not in self._arrays:
                     self._arrays[outer_key] = {}

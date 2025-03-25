@@ -162,7 +162,6 @@ class DemonstrationAlgorithm(BaseImitationAlgorithm, Generic[TransitionKind]):
         )
 
         if demonstrations is not None:
-            print("This is the expert demons type beofre processing: ", type(demonstrations))
             self.set_demonstrations(demonstrations)
 
     @abc.abstractmethod

@@ -237,6 +237,8 @@ class Buffer:
                         for sub_k, sub_arr in arr.items():
                             print("Checking for the details of sub_k from arr.items:", sub_k)
                             print("Checking for the details of sub_arr from arr.items:", sub_arr)
+                            print("Checking for the details of sub_arr shape from arr.items:", sub_arr.shape)
+                            print("Checking for what's being passed to the store_easy function:", sub_arr[:n_remain])
                             # Store the sub-arrays directly under their nested keys
                             nested_key = (k, sub_k)  # Use a tuple for nested keys
                             self._store_easy({nested_key: sub_arr[:n_remain]})

@@ -243,6 +243,10 @@ class Buffer:
                             nested_key = (k, sub_k)  # Use a tuple for nested keys
                             self._store_easy({nested_key: sub_arr[:n_remain]})
                     else:
+                        print("Checking for the details of sub_k from arr.items that are not in Dict:", k)
+                        print("Checking for the details of sub_arr from arr.items that are not in Dict:", arr)
+                        print("Checking for the details of sub_arr shape from arr.items that are not in Dict:", arr.shape)
+                        print("Checking for what's being passed to the store_easy function that are not in Dict:", arr[:n_remain])
                         self._store_easy({k: arr[:n_remain]})
     
                 assert self._idx == 0

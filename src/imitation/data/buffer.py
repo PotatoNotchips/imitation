@@ -227,6 +227,7 @@ class Buffer:
             n_remain = self.capacity - self._idx
             # Need to loop around the buffer. Break into two "easy" calls.
             # Handle storage for both dict and non-dict formats
+            print("Checking for the very first data details after entering the store funnction:", data)
             if any(isinstance(arr, (dict, DictObs)) for arr in data.values()):
                 # Flatten and store for dictionary entries
                 for k, arr in list(data.items()):

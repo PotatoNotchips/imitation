@@ -220,33 +220,21 @@ class Buffer:
                 if arr.shape[1:] != self.sample_shapes[k]:
                     raise ValueError(f"Wrong data shape for {k}")
         '''
-        print("Checking for the data that is in the store function but not pass to store easy yet:", data)
         
         new_idx = self._idx + n_samples
         if new_idx > self.capacity:
             n_remain = self.capacity - self._idx
             # Need to loop around the buffer. Break into two "easy" calls.
             # Handle storage for both dict and non-dict formats
-            print("Checking for the very first data details after entering the store funnction:", data)
             if any(isinstance(arr, (dict, DictObs)) for arr in data.values()):
                 # Flatten and store for dictionary entries
                 for k, arr in list(data.items()):
-                    print("Checking for the details of k from data.items:", k)
-                    print("Checking for the details of arr from data.items:", arr)
                     if isinstance(arr, (dict, DictObs)):
                         for sub_k, sub_arr in arr.items():
-                            print("Checking for the details of sub_k from arr.items:", sub_k)
-                            print("Checking for the details of sub_arr from arr.items:", sub_arr)
-                            print("Checking for the details of sub_arr shape from arr.items:", sub_arr.shape)
-                            print("Checking for what's being passed to the store_easy function:", sub_arr[:n_remain])
                             # Store the sub-arrays directly under their nested keys
                             nested_key = (k, sub_k)  # Use a tuple for nested keys
                             self._store_easy({nested_key: sub_arr[:n_remain]})
                     else:
-                        print("Checking for the details of sub_k from arr.items that are not in Dict:", k)
-                        print("Checking for the details of sub_arr from arr.items that are not in Dict:", arr)
-                        print("Checking for the details of sub_arr shape from arr.items that are not in Dict:", arr.shape)
-                        print("Checking for what's being passed to the store_easy function that are not in Dict:", arr[:n_remain])
                         self._store_easy({k: arr[:n_remain]})
     
                 assert self._idx == 0
@@ -284,17 +272,9 @@ class Buffer:
         assert n_samples <= self.capacity - self._idx
         idx_hi = self._idx + n_samples
         for k, arr in data.items():
-            print("Checking what's the data mean:", type(data))
-            print("Checking what's the data actually is:", data)
-            print("Checking what's the k mean:", type(k))
-            print("Checking what's the k actually is:", k)
             # Ensure k is a tuple for nested keys
             if isinstance(k, tuple):
                 outer_key, inner_key = k
-                print(f"outer_key: {outer_key}, type: {type(outer_key)}")
-                print(f"inner_key: {inner_key}, type: {type(inner_key)}")
-                print(f"self._arrays[{outer_key}] type: {type(self._arrays.get(outer_key))}")
-                print(f"self._arrays[{outer_key}] deails: {(self._arrays.get(outer_key))}")
                 # Initialize nested dictionary if it does not exist
                 if outer_key not in self._arrays:
                     self._arrays[outer_key] = {}
@@ -314,9 +294,6 @@ class Buffer:
                     # Ensure arr is a NumPy array
                     if not isinstance(arr, np.ndarray):
                         raise ValueError(f"Expected NumPy array for key {k}, but got {type(arr)}.")
-
-                    print("Checking the arr shape right now:", arr.shape)
-                    print("Checking the arr details right now:", arr)
                     
                     if inner_key not in self._arrays[outer_key]:
                         self._arrays[outer_key][inner_key] = np.empty((self.capacity, arr.shape[1]))  # Adjust shape as needed

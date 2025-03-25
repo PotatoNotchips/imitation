@@ -106,7 +106,7 @@ class Buffer:
         self._arrays = {
             "obs": {"stock_obs": np.zeros((capacity,) + (390, 33), dtype=np.float32),
                     "additional_info": np.zeros((capacity,) + (4,), dtype=np.float32)},
-            "acts": np.zeros((capacity,) + (1,)),
+            "acts": np.zeros((capacity,) + (,)),
             "next_obs": {"stock_obs": np.zeros((capacity,) + (390, 33), dtype=np.float32),
                     "additional_info": np.zeros((capacity,) + (4,), dtype=np.float32)},
             "dones": np.zeros((capacity,) + (), dtype=np.dtype(bool)),

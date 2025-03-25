@@ -432,10 +432,7 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
 
         gen_trajs, ep_lens = self.venv_buffering.pop_trajectories()
         self._check_fixed_horizon(ep_lens)
-        print("Checking for the details of gen_trajs before flatten:", gen_trajs)
         gen_samples = rollout.flatten_trajectories_with_rew(gen_trajs)
-        print("Checking for the type of gen_samples being stored to the buffer:", type(gen_samples))
-        print("Checking for the gen_samples being stored to the buffer:", gen_samples)
         self._gen_replay_buffer.store(gen_samples)
 
     def train(

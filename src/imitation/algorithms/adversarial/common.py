@@ -946,6 +946,9 @@ class AdversarialTrainer(base.DemonstrationAlgorithm[types.Transitions]):
                         lstm_states=lstm_states, 
                         episode_starts=episode_starts_th,
                     )
+                    print("Checking the type of log policy act prob:", type(log_policy_act_prob))
+                    print("Checking the shape of log policy act prob:", log_policy_act_prob.shape)
+                    print("Checking the shape of self.demo minibatch size:", self.demo_minibatch_size)
                     if log_policy_act_prob is not None:
                         assert len(log_policy_act_prob) == 2 * self.demo_minibatch_size
                         log_policy_act_prob = log_policy_act_prob.reshape((2 * self.demo_minibatch_size,))

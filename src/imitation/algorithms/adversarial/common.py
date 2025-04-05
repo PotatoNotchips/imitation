@@ -76,6 +76,7 @@ def compute_train_stats(
         generated_acc = _n_pred_gen / float(_n_gen_or_1)
 
         disc_logits_expert_is_high = th.nan_to_num(disc_logits_expert_is_high, nan=0.0)
+        print("Checking the disc logits expert is high to verify the entropy:", disc_logits_expert_is_high)
         label_dist = th.distributions.Bernoulli(logits=disc_logits_expert_is_high)
         entropy = th.mean(label_dist.entropy())
 
